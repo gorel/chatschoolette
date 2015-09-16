@@ -1,0 +1,1 @@
+from chatschoolette import db

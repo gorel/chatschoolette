@@ -10,11 +10,20 @@ from flask.ext.login import (
     login_user,
     logout_user,
 )
+from flask.ext.wtf import (
+    CsrfProtect,
+)
 
 # Define the web app
 sys.stdout.write('Creating Flask app...')
 app = Flask(__name__)
 sys.stdout.write('Done\n')
+
+# Enable CSRF Protection
+sys.stdout.write('Enabling CSRF Protection...')
+csrf = CsrfProtect()
+csrf.init_app(app)
+sys.stdout.write('Done.\n')
 
 # Configurations for the app
 sys.stdout.write('Loading config from object...')
@@ -41,6 +50,7 @@ def not_found(error):
 sys.stdout.write('Done\n')
 
 # Import all blueprints from controllers
+from chatschoolette.controllers import mod_default
 from chatschoolette.mod_account.controllers import mod_account
 from chatschoolette.mod_admin.controllers import mod_admin
 from chatschoolette.mod_auth.controllers import mod_auth
@@ -48,14 +58,12 @@ from chatschoolette.mod_chat.controllers import mod_chat
 
 # Register blueprints
 sys.stdout.write('Registering blueprint modules...')
+app.register_blueprint(mod_default)
 app.register_blueprint(mod_account)
 app.register_blueprint(mod_admin)
 app.register_blueprint(mod_auth)
 app.register_blueprint(mod_chat)
 sys.stdout.write('Done\n')
-
-# Import base controller
-import chatschoolette.controllers
 
 # Build database with SQLAlchemy
 sys.stdout.write('Building database with SQLAlchemy...')

@@ -16,9 +16,16 @@ from werkzeug import (
 
 from chatschoolette import app
 
+# Create the default module blueprint
+mod_default = Blueprint('default', __name__, url_prefix='')
+
 # Set all routing for the default app (not within modules)
-@app.route('/')
-@app.route('/home')
-@app.route('/index.html')
+@mod_default.route('/')
+@mod_default.route('/home')
+@mod_default.route('/index.html')
 def home():
     return render_template('index.html')
+
+@mod_default.route('/about/')
+def about():
+    return render_template('about.html')

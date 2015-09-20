@@ -1,0 +1,27 @@
+{% from "partials/_formhelper.html" import render_field %}
+
+{% extends 'layout.html' %}
+{% block body %}
+    <div class="page-header">
+        <h1>Register</h1>
+    </div>
+
+    <form method="POST" action="/auth/register/">
+        {{ form.hidden_tag() }}
+        <dl>
+            {{ render_field(form.username) }}
+            {{ render_field(form.email) }}
+            {{ render_field(form.confirm_email) }}
+            {{ render_field(form.password) }}
+            {{ render_field(form.confirm_password) }}
+            {{ render_field(form.gender) }}
+            {{ render_field(form.birthdate) }}
+            {{ render_field(form.profile_picture) }}
+            {{ render_field(form.profile_description) }}
+            {{ render_field(form.interests) }}
+            {{ render_field(form.recaptcha) }}
+        </dl>
+        <p><input type="submit" value="Register"></p>
+    </form>
+
+{% endblock %}

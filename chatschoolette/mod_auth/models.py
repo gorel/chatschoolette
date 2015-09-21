@@ -42,7 +42,6 @@ class User(db.Model):
         self._is_authenticated = True
         self._is_active = True
 
-
     @property
     def is_authenticated(self):
         return self._is_authenticated
@@ -55,11 +54,18 @@ class User(db.Model):
     def is_anonymous(self):
         return not self.is_authenticated()
 
+    def check_password(self, password):
+        return check_password_hash(self.password, password)
+
     def get_id(self):
         return self.id
 
     def __repr__(self):
         return '<User %r>' % self.username
+
+    @classmethod
+    def get_by_username(cls, username):
+        return User.query.filter_by(username=username).first()
 
     @classmethod
     def get_by_email(cls, email):

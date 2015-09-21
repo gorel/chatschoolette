@@ -15,6 +15,7 @@ from flask.ext.wtf.file import (
 )
 
 from wtforms import (
+    BooleanField,
     PasswordField,
     RadioField,
     TextAreaField,
@@ -39,7 +40,7 @@ class RegistrationForm(Form):
         validators=[
             validators.Email(),
             validators.Required(
-                message='You must provide your school email address.'
+                message='You must provide your school email address.',
             ),
             validators.EqualTo(
                 'confirm_email',
@@ -75,7 +76,7 @@ class RegistrationForm(Form):
         'Confirm Password',
         validators=[
             validators.Required(
-                message='Please confirm your password.'
+                message='Please confirm your password.',
             ),
         ],
     )
@@ -116,7 +117,35 @@ class RegistrationForm(Form):
     recaptcha = RecaptchaField()
 
 class LoginForm(Form):
-    pass
+    username_or_email = TextField(
+        'Username or Email',
+        validators=[
+            validators.Required(
+                message='This field cannot be left empty.',
+            ),
+        ],
+    )
+
+    password = PasswordField(
+        'Password',
+        validators=[
+            validators.Required(
+                message='Please enter a password.',
+            ),
+        ],
+    )
+
+    remember = BooleanField(
+        'Remember Me?',
+    )
 
 class ForgotForm(Form):
-    pass
+    email = TextField(
+        'Email',
+        validators=[
+            validators.Email(),
+            validators.Required(
+                message='You must provide your school email address.',
+            ),
+        ],
+    )

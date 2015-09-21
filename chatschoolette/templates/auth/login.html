@@ -1,7 +1,19 @@
+{% from "partials/_formhelper.html" import render_field %}
+
 {% extends 'layout.html' %}
 {% block body %}
     <div class="page-header">
         <h1>Login</h1>
     </div>
+
+    <form method="POST" action="/auth/login/">
+        {{ form.hidden_tag() }}
+        <dl>
+            {{ render_field(form.username_or_email) }}
+            {{ render_field(form.password) }}
+            {{ render_field(form.remember) }}
+        </dl>
+        <p><input type="submit" value="Register"></p>
+    </form>
 
 {% endblock %}

@@ -47,6 +47,7 @@ def register():
     form = RegistrationForm(request.form)
     if form.validate_on_submit():
         # TODO: Lots of error checking for unique values
+        # Login user if the username/email and password match existing account
         interests = []
 
         # Add each of the user's interests
@@ -95,16 +96,34 @@ def register():
 def login():
     form = LoginForm(request.form)
     if form.validate_on_submit():
-        # TODO: Login code here
-        # 1. Get form fields
-        # 2. Check password
-        # 3. Login
+        if '@' in form.username_or_email.data:
+            user = User.get_by_email(form.username_or_email.data)
+            if user is None:
+                # TODO: Prepopulate email field?
+                flash('No account with that email exists!', 'alert-warning')
+                return redirect(url_for('auth.register'))
+        else:
+            user = User.get_by_username(form.username_or_email.data)
+            if user is None:
+                # TODO: Prepopulate user field?
+                flash('No account with that username exists!', 'alert-warning')
+                return redirect(url_for('auth.register'))
+
+        if not user.check_password(form.password.data):
+            flash('Incorrect password! Try again?', 'alert-danger')
+            return render_template('auth/login.html', form=form)
+
+        # User has authenticated. Log in.
+        login_user(user, remember=form.remember.data)
         return redirect(request.args.get('next') or url_for('default.home'))
     else:
         return render_template('auth/login.html', form=form)
 
 @mod_auth.route('/logout/', methods=['POST'])
-@login_required
 def logout():
-    logout_user()
+    # Don't set login required, because it will send the user to the login page
+    # before redirecting them to logout. It doesn't make much sense to the user.
+    if current_user.is_authenticated:
+        logout_user()
+    flash('You have successfully logged out.', 'alert-success')
     return redirect(url_for('default.home'))

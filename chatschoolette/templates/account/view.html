@@ -1,0 +1,31 @@
+{% extends 'layout.html' %}
+{% block body %}
+    <div class="page-header">
+        <h1>{{ profile.user.username }}'s account</h1>
+    </div>
+    {% if profile.has_profile_picture %}
+    <img
+        src="{{ url_for('static', filename=('profile_pictures/' + profile.user.username)) }}"
+        style="max-width: 300px; height: auto;"
+    >
+    {% else %}
+    <img src="{{ url_for('static', filename='profile_pictures/default') }}" style="max-width: 300px; height: auto;">
+    {% endif %}
+
+    <h2>About {{ profile.user.username }}</h2>
+    <p>
+    {% if profile.body != '' %}
+    {{ profile.body }}
+    {% else %}
+    {{ profile.user.username }} is too cool to fill out this section.
+    {% endif %}
+    </p>
+
+    <h2>Interests</h2>
+    <ul>
+    {% for interest in profile.interests|sort %}
+    <li>{{ interest.name }}</li>
+    {% endfor %}
+    </ul>
+
+{% endblock %}

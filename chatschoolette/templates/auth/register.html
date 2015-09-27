@@ -6,7 +6,7 @@
         <h1>Register</h1>
     </div>
 
-    <form method="POST" action="/auth/register/">
+    <form method="POST" action="/auth/register/" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
         <dl>
             {{ render_field(form.username) }}
@@ -18,7 +18,8 @@
             {{ render_field(form.birthdate) }}
             {{ render_field(form.profile_picture) }}
             {{ render_field(form.profile_description) }}
-            {{ render_field(form.interests) }}
+            {{ render_field(form.interests_text) }}
+            {{ render_field(form.remember) }}
             {{ render_field(form.recaptcha) }}
         </dl>
         <p><input type="submit" value="Register"></p>

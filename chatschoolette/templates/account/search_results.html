@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 {% block body %}
     <div class="page-header">
-        <h1>Administrator Controls</h1>
+        <h1>Search results</h1>
     </div>
 
     <table class="table-responsive">
@@ -17,16 +17,8 @@
             <td class="col-md-2">{{ user.username }}</td>
             <td class="col-md-6">{{ user.profile.body|truncate }}</td>
             <td class="col-md-3"><a href="/account/{{ user.profile.id }}" class="btn btn-danger">View Profile</a></td>
-            <form method="POST" action="/admin/reset_password/{{ user.id }}/">
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-                <td class="col-md-3"><button type="submit" class="btn btn-warning">Reset Password</button></td>
-            </form>
-            <form method="POST" action="/admin/ban/{{ user.id }}/">
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-                <td class="col-md-3"><button type="submit" class="btn btn-danger">BAN USER</button></td>
-            </form>
         </tr>
     {% endfor %}
-    </table>
+    <table>
 
 {% endblock %}

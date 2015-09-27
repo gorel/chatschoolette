@@ -32,6 +32,7 @@ from chatschoolette.mod_auth.forms import (
 from chatschoolette.mod_account.models import (
     Interest,
     Profile,
+    profile_interests,
 )
 
 from chatschoolette.mod_auth.models import (
@@ -44,68 +45,50 @@ mod_auth = Blueprint('auth', __name__, url_prefix='/auth')
 # Set all routing for the module
 @mod_auth.route('/register/', methods=['GET', 'POST'])
 def register():
-    form = RegistrationForm(request.form)
+    form = RegistrationForm()
     if form.validate_on_submit():
-        # TODO: Lots of error checking for unique values
-        # Login user if the username/email and password match existing account
-        interests = []
+        # Create the user account by first
+        db.session.add(form.user)
+        db.session.add(form.profile)
+        db.session.commit()
 
-        # Add each of the user's interests
-        for interest_name in filter(None, form.interests.data.splitlines()):
-            interest_name = interest_name.lower()
-            interest = Interest.query.filter_by(name=interest_name).first()
+        # Add the user's profile picture if they provided one
+        if form.profile_picture.has_file():
+            form.profile.set_profile_picture(form.profile_picture)
 
-            # Add a new interest to the DB if it doesn't exist
-            if interest is None:
-                interest = Interest(name=interest_name)
+        # Add all of the user's interests
+        for interest_name in form.interests:
+
+            if Interest.query.filter_by(name=interest.name).first() is None:
                 db.session.add(interest)
+                db.session.flush()
+            profile_interests.insert().values(
+                profile_id=form.profile.id,
+                interest_id=interest.id,
+            )
 
-            interests.append(interest)
-
-        # Create a new user profile
-        profile = Profile(
-            profile_pic=(form.profile_picture.data is not None),
-            domain=form.email.data.split('@')[1],
-            gender=form.gender.data,
-            birthdate=form.birthdate.data,
-            body=form.profile_description.data,
-            interests=interests,
-        )
-        db.session.add(profile)
-
-        # Create a new user
-        user = User(
-            username=form.username.data,
-            email=form.email.data,
-            password=form.password.data,
-            profile=profile,
-        )
-        db.session.add(user)
-
+        # Finally, commit the db session
         db.session.commit()
 
         # Log the user in and redirect to the homepage
-        login_user(user)
+        login_user(form.user, remember=form.remember.data)
         flash('Your account has been created.', 'alert-success')
         return redirect(request.args.get('next') or url_for('default.home'))
     else:
-        # TODO: flash errors
         return render_template('auth/register.html', form=form)
 
 @mod_auth.route('/login/', methods=['GET', 'POST'])
 def login():
-    form = LoginForm(request.form)
+    form = LoginForm()
     if form.validate_on_submit():
         if '@' in form.username_or_email.data:
             user = User.get_by_email(form.username_or_email.data)
             if user is None:
-                # TODO: Prepopulate email field?
                 flash('No account with that email exists!', 'alert-warning')
                 return redirect(url_for('auth.register'))
         else:
             user = User.get_by_username(form.username_or_email.data)
             if user is None:
-                # TODO: Prepopulate user field?
                 flash('No account with that username exists!', 'alert-warning')
                 return redirect(url_for('auth.register'))
 
@@ -127,3 +110,18 @@ def logout():
         logout_user()
     flash('You have successfully logged out.', 'alert-success')
     return redirect(url_for('default.home'))
+
+@mod_auth.route('/reset/<key>', methods=['GET', 'POST'])
+def reset(key):
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        form.user.reset_password(form.password.data)
+        flash(
+            "Your password has been successfully reset!",
+            "alert-success",
+        )
+        login_user(form.user)
+        return redirect(url_for('default.home'))
+    else:
+        form.reset_key.data = key
+        return render_template('auth/reset.html', form=form)

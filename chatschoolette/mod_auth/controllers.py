@@ -56,17 +56,6 @@ def register():
         if form.profile_picture.has_file():
             form.profile.set_profile_picture(form.profile_picture)
 
-        # Add all of the user's interests
-        for interest_name in form.interests:
-
-            if Interest.query.filter_by(name=interest.name).first() is None:
-                db.session.add(interest)
-                db.session.flush()
-            profile_interests.insert().values(
-                profile_id=form.profile.id,
-                interest_id=interest.id,
-            )
-
         # Finally, commit the db session
         db.session.commit()
 

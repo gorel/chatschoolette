@@ -10,6 +10,11 @@ from flask.ext.login import (
     login_user,
     logout_user,
 )
+from flask.ext.uploads import (
+    configure_uploads,
+    IMAGES,
+    UploadSet,
+)
 from flask.ext.wtf import (
     CsrfProtect,
 )
@@ -23,7 +28,7 @@ sys.stdout.write('Done\n')
 sys.stdout.write('Enabling CSRF Protection...')
 csrf = CsrfProtect()
 csrf.init_app(app)
-sys.stdout.write('Done.\n')
+sys.stdout.write('Done\n')
 
 # Configurations for the app
 sys.stdout.write('Loading config from object...')
@@ -40,6 +45,12 @@ sys.stdout.write('Creating login manager...')
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "/auth/login"
+sys.stdout.write('Done\n')
+
+# Set allowed uploads
+sys.stdout.write('Configuring uploads...')
+IMAGE_SET = UploadSet('images', IMAGES)
+configure_uploads(app, (IMAGE_SET,))
 sys.stdout.write('Done\n')
 
 # Register error handlers

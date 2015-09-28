@@ -58,6 +58,7 @@ target/
 
 # Hide this file since it contains secret keys
 config.py
+testconfig.py
 
 # Database files
 *.db

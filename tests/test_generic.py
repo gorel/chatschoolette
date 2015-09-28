@@ -37,10 +37,9 @@ from chatschoolette.mod_chat.models import (
 
 
 class GenericTestCase(TestCase):
-
     def create_app(self):
         # Define the web app
-        app = Flask(__name__)
+        app = Flask(__name__, template_folder='../chatschoolette/templates')
 
         # Enable CSRF Protection
         csrf = CsrfProtect()
@@ -91,3 +90,7 @@ class GenericTestCase(TestCase):
 
     def testTrue(self):
         return True
+
+    def test_load_home(self):
+        response = self.client.get('/')
+        assert 'ChatSchoolette' in response.data

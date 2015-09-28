@@ -65,3 +65,5 @@ testconfig.py
 
 # Hide profile picture directory
 profile_pictures/
+
+*.swp

@@ -37,10 +37,9 @@ from chatschoolette.mod_chat.models import (
 
 
 class AuthTestCase(TestCase):
-
     def create_app(self):
         # Define the web app
-        app = Flask(__name__)
+        app = Flask(__name__, template_folder='../chatschoolette/templates')
 
         # Enable CSRF Protection
         csrf = CsrfProtect()

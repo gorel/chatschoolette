@@ -14,8 +14,6 @@ from werkzeug import (
     generate_password_hash
 )
 
-from chatschoolette import app
-
 # Create the default module blueprint
 mod_default = Blueprint('default', __name__, url_prefix='')
 

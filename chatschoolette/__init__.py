@@ -19,20 +19,21 @@ from flask.ext.wtf import (
     CsrfProtect,
 )
 
+IMAGE_SET = UploadSet('images', IMAGES)
+
 # Define the web app
 sys.stdout.write('Creating Flask app...')
 app = Flask(__name__)
 sys.stdout.write('Done\n')
 
-# Enable CSRF Protection
-sys.stdout.write('Enabling CSRF Protection...')
-csrf = CsrfProtect()
-csrf.init_app(app)
-sys.stdout.write('Done\n')
-
 # Configurations for the app
 sys.stdout.write('Loading config from object...')
 app.config.from_object('config')
+sys.stdout.write('Done\n')
+
+# Enable CSRF Protection
+sys.stdout.write('Enabling CSRF Protection...')
+CsrfProtect(app)
 sys.stdout.write('Done\n')
 
 # Define the database
@@ -49,7 +50,6 @@ sys.stdout.write('Done\n')
 
 # Set allowed uploads
 sys.stdout.write('Configuring uploads...')
-IMAGE_SET = UploadSet('images', IMAGES)
 configure_uploads(app, (IMAGE_SET,))
 sys.stdout.write('Done\n')
 
@@ -74,11 +74,6 @@ app.register_blueprint(mod_account)
 app.register_blueprint(mod_admin)
 app.register_blueprint(mod_auth)
 app.register_blueprint(mod_chat)
-sys.stdout.write('Done\n')
-
-# Build database with SQLAlchemy
-sys.stdout.write('Building database with SQLAlchemy...')
-db.create_all()
 sys.stdout.write('Done\n')
 
 sys.stdout.write('\nApp done loading.\n')

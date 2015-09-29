@@ -86,6 +86,7 @@ def login():
             return render_template('auth/login.html', form=form)
 
         # User has authenticated. Log in.
+        flash('Welcome back to ChatSchoolette!', 'alert-success')
         login_user(user, remember=form.remember.data)
         return redirect(request.args.get('next') or url_for('default.home'))
     else:

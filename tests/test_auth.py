@@ -1,7 +1,8 @@
+from datetime import datetime
 import os
+import unittest
 
-from flask import Flask
-from flask.ext.testing import TestCase
+from flask import Flask, escape
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.login import (
     LoginManager,
@@ -18,7 +19,7 @@ from flask.ext.wtf import (
     CsrfProtect,
 )
 
-from chatschoolette import db
+from chatschoolette import app, db
 
 from chatschoolette.mod_account.models import (
     Interest,
@@ -35,54 +36,27 @@ from chatschoolette.mod_chat.models import (
     ChatRoom,
 )
 
+from config import BASE_DIR
 
-class AuthTestCase(TestCase):
-    def create_app(self):
-        # Define the web app
-        app = Flask(__name__, template_folder='../chatschoolette/templates')
-
-        # Enable CSRF Protection
-        csrf = CsrfProtect()
-        csrf.init_app(app)
-
-        # Configurations for the app
-        app.config.from_object('testconfig')
-
-        # Define the database
-        db = SQLAlchemy(app)
-
-        # Create the login manager
-        login_manager = LoginManager()
-        login_manager.init_app(app)
-        login_manager.login_view = "/auth/login"
-
-        # Set allowed uploads
-        IMAGE_SET = UploadSet('images', IMAGES)
-        configure_uploads(app, (IMAGE_SET,))
-
-        # Register error handlers
-        @app.errorhandler(404)
-        def not_found(error):
-            return render_template('404.html'), 404
-
-        # Import all blueprints from controllers
-        from chatschoolette.controllers import mod_default
-        from chatschoolette.mod_account.controllers import mod_account
-        from chatschoolette.mod_admin.controllers import mod_admin
-        from chatschoolette.mod_auth.controllers import mod_auth
-        from chatschoolette.mod_chat.controllers import mod_chat
-
-        # Register blueprints
-        app.register_blueprint(mod_default)
-        app.register_blueprint(mod_account)
-        app.register_blueprint(mod_admin)
-        app.register_blueprint(mod_auth)
-        app.register_blueprint(mod_chat)
-
-        return app
-
+class AuthTestCase(unittest.TestCase):
     def setUp(self):
+        app.config['TESTING'] = True
+        app.config['WTF_CSRF_ENABLED'] = False
+        app.config['CSRF_ENABLED'] = False
+        app.config['SQLALCHEMY_DATABASE_URI'] = (
+            'sqlite:///' + os.path.join(BASE_DIR, 'test.db')
+        )
+        self.app = app
+        self.client = app.test_client()
         db.create_all()
+
+        user = User(
+            username='test_default',
+            email='unit_test_default@test.com',
+            password='hunter2',
+        )
+        db.session.add(user)
+        db.session.commit()
 
     def tearDown(self):
         db.session.remove()
@@ -90,3 +64,33 @@ class AuthTestCase(TestCase):
 
     def testTrue(self):
         return True
+
+    def test_account_not_exists(self):
+        username = 'test_user'
+        user = User.query.filter_by(username=username).first()
+        assert user is None
+
+    def test_account_exists(self):
+        username = 'test_default'
+        user = User.query.filter_by(username=username).first()
+        assert user is not None
+
+    def test_create_user(self):
+        username = 'test_create_user'
+        email = escape('unit_test_create_user@test.com')
+        password = 'hunter2'
+
+        user = User(username, email, password)
+        db.session.add(user)
+        db.session.commit()
+
+        assert user is not None
+
+    def test_delete_user(self):
+        user = User.query.first()
+        username = user.username
+        db.session.delete(user)
+        db.session.commit()
+
+        user = User.query.filter_by(username=username).first()
+        assert user is None

@@ -61,7 +61,8 @@ def register():
         db.session.commit()
 
         # Log the user in and redirect to the homepage
-        login_user(form.user, remember=form.remember.data)
+        login_user(form.user, remember=form.remember.data, force=True)
+        x = 3 / 0
         flash('Your account has been created.', 'alert-success')
         return redirect(request.args.get('next') or url_for('default.home'))
     else:
@@ -88,7 +89,7 @@ def login():
 
         # User has authenticated. Log in.
         flash('Welcome back to ChatSchoolette!', 'alert-success')
-        login_user(user, remember=form.remember.data)
+        login_user(user, remember=form.remember.data, force=True)
         return redirect(request.args.get('next') or url_for('default.home'))
     else:
         return render_template('auth/login.html', form=form)
@@ -111,7 +112,7 @@ def reset(key):
             "Your password has been successfully reset!",
             "alert-success",
         )
-        login_user(form.user)
+        login_user(form.user, force=True)
         return redirect(url_for('default.home'))
     else:
         form.reset_key.data = key

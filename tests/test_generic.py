@@ -60,3 +60,5 @@ class GenericTestCase(unittest.TestCase):
     def test_load_home(self):
         response = self.client.get('/')
         assert 'ChatSchoolette' in response.data
+
+    # TODO: Write more tests!

@@ -59,6 +59,10 @@ def ban(user_id):
             "User %r has been banned." % user.username,
             "alert-success",
         )
+        user.messages = []
+        db.session.delete(user.queue_position)
+        db.session.delete(user.pw_reset)
+        db.session.delete(user.profile)
         db.session.delete(user)
         db.session.commit()
 

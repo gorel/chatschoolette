@@ -1,4 +1,6 @@
 import random
+import string
+
 
 from flask.ext.sqlalchemy import (
     orm,
@@ -37,6 +39,13 @@ class User(db.Model):
     email = db.Column(db.String(64), index=True, unique=True)
     password = db.Column(db.String(64))
     is_admin = db.Column(db.Boolean)
+    _is_active = db.Column(db.Boolean)
+
+    activation_key = db.relationship(
+        'ActivationKey',
+        uselist=False,
+        backref='user',
+    )
 
     pw_reset = db.relationship(
         'PasswordReset',
@@ -64,6 +73,8 @@ class User(db.Model):
         self.email = email
         self.password = generate_password_hash(password)
         self.is_admin = is_admin
+        self._is_active = False
+        self.activation_key = ActivationKey()
 
         # Call the method to load local variables NOT stored in the db
         self.init_on_load()
@@ -72,7 +83,6 @@ class User(db.Model):
     def init_on_load(self):
         # Any user that is logged in is automatically authenticated.
         self._is_authenticated = True
-        self._is_active = True
 
     @property
     def is_authenticated(self):
@@ -82,9 +92,14 @@ class User(db.Model):
     def is_active(self):
         return self._is_active
 
+    @is_active.setter
+    def is_active(self, value):
+        db.session.delete(self.activation_key)
+        self._is_active = value
+
     @property
     def is_anonymous(self):
-        return not self.is_authenticated()
+        return not self.is_authenticated
 
     def check_password(self, password):
         return check_password_hash(self.password, password)
@@ -150,3 +165,22 @@ class PasswordReset(db.Model):
     def __init__(self, user_id, key):
         self.user_id = user_id
         self.key = key
+
+    def __repr__(self):
+        return '<PasswordReset for %r>' % self.user.username
+
+class ActivationKey(db.Model):
+    __tablename__ = "activation_key"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), index=True)
+    key = db.Column(db.String(64), index=True)
+
+    def __init__(self):
+        self.key = ''.join(
+            random.choice(
+                string.ascii_letters + string.digits
+            ) for _ in range(60)
+        )
+
+    def __repr__(self):
+        return '<ActivationKey for %r>' % self.user.username

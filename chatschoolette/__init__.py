@@ -3,6 +3,7 @@ import sys
 
 # Flask imports
 from flask import Flask, render_template
+from flask_mail import Mail
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.login import (
     LoginManager,
@@ -51,6 +52,11 @@ sys.stdout.write('Done\n')
 # Set allowed uploads
 sys.stdout.write('Configuring uploads...')
 configure_uploads(app, (IMAGE_SET,))
+sys.stdout.write('Done\n')
+
+# Register Mailer service
+sys.stdout.write('Configuring Mailer service...')
+mail = Mail(app)
 sys.stdout.write('Done\n')
 
 # Register error handlers

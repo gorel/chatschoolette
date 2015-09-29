@@ -267,3 +267,22 @@ class ResetPasswordForm(Form):
     )
 
     reset_key = HiddenField()
+
+
+class ActivateAccountForm(Form):
+    def __init__(self, *args, **kwargs):
+        Form.__init__(self, *args, **kwargs)
+        self.user = None
+
+    def validate(self):
+        if not Form.validate(self):
+            return False
+
+        user = User.query.filter_by(activation_key=self.activation_key).first()
+        if user is None:
+            return False
+
+        self.user = user
+        return True
+
+    activate_key = HiddenField()

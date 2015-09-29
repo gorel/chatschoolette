@@ -24,6 +24,7 @@ from chatschoolette import db, login_manager
 
 # Import forms
 from chatschoolette.mod_auth.forms import (
+    ActivateAccountForm,
     LoginForm,
     RegistrationForm,
 )
@@ -115,3 +116,16 @@ def reset(key):
     else:
         form.reset_key.data = key
         return render_template('auth/reset.html', form=form)
+
+@mod_auth.route('/activate/<key>', methods=['GET', 'POST'])
+def activate(key):
+    form = ActivateAccountForm()
+    if form.validate_on_submit():
+        form.user.set_active()
+        db.session.commit()
+        flash('Your account is now activated! Get chatting!', 'alert-success')
+        return redirect(url_for('default.home'))
+    else:
+        form.activation_key.data = key
+        return render_template('auth/activate.html', form=form)
+

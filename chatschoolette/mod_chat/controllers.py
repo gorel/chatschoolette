@@ -13,7 +13,7 @@ from flask.ext.login import (
 )
 
 # Import main DB and Login Manager for app
-from chatschoolette import db, login_manager
+from chatschoolette import db, login_manager, flash_form_errors
 
 # Import forms
 from chatschoolette.mod_chat.forms import (
@@ -55,6 +55,7 @@ def home():
         #         chat_queue.add(user2)
         pass
     else:
+        flash_form_errors(form)
         return render_template('chat/home.html', form=form)
 
 @mod_chat.route('/room/<int:chat_id>', methods=['GET'])

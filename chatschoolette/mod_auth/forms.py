@@ -196,6 +196,37 @@ class RegistrationForm(Form):
     recaptcha = BooleanField('Testing')#RecaptchaField()
 
 class LoginForm(Form):
+    def __init__(self, *args, **kwargs):
+        Form.__init__(self, *args, **kwargs)
+        self.user = None
+
+    def validate(self):
+        if not Form.validate(self):
+            return False
+
+        user = User.query.filter_by(
+            username=self.username_or_email.data
+        ).first()
+        if user is None:
+            user = User.query.filter_by(
+                email=self.username_or_email.data
+            ).first()
+
+        if user is None:
+            self.username_or_emails.errors.append(
+                "No account with that username or email found!"
+            )
+            return False
+
+        if not user.check_password(self.password.data):
+            self.password.errors.append(
+                "Incorrect password!"
+            )
+            return False
+
+        self.user = user
+        return True
+
     username_or_email = TextField(
         'Username or Email',
         validators=[

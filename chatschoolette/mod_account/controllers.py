@@ -21,7 +21,7 @@ from chatschoolette.mod_account.models import (
 )
 
 # Import main DB and Login Manager for app
-from chatschoolette import db, login_manager
+from chatschoolette import db, login_manager, flash_form_errors
 
 # Import forms
 from chatschoolette.mod_account.forms import (
@@ -50,6 +50,7 @@ def edit():
         )
         return redirect(url_for('account.home'))
     else:
+        flash_form_errors(form)
         form.gender.data = current_user.profile.gender
         form.profile_description.data = current_user.profile.body
         form.interests_text.data = '\n'.join(
@@ -70,6 +71,7 @@ def search():
             return render_template('account/search.html', form=form)
         return render_template('account/search_results.html', users=form.users)
     else:
+        flash_form_errors(form)
         return render_template('account/search.html', form=form)
 
 @mod_account.route('/<int:profile_id>/', methods=['GET'])

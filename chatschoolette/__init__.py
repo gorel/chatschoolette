@@ -2,7 +2,7 @@
 import sys
 
 # Flask imports
-from flask import Flask, render_template
+from flask import Flask, render_template, flash
 from flask_mail import Mail
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.login import (
@@ -64,6 +64,14 @@ sys.stdout.write('Registering error handlers...')
 @app.errorhandler(404)
 def not_found(error):
     return render_template('404.html'), 404
+
+def flash_form_errors(form):
+    for field, errors in form.errors.items():
+        for error in errors:
+            flash(
+                "%s: %s" % (getattr(form, field).label.text, error),
+                "alert-danger"
+            )
 sys.stdout.write('Done\n')
 
 # Import all blueprints from controllers

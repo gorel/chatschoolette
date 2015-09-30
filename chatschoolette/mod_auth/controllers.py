@@ -20,7 +20,7 @@ from werkzeug import (
 )
 
 # Import main DB and Login Manager for app
-from chatschoolette import db, login_manager
+from chatschoolette import db, login_manager, flash_form_errors
 
 # Import forms
 from chatschoolette.mod_auth.forms import (
@@ -62,36 +62,22 @@ def register():
 
         # Log the user in and redirect to the homepage
         login_user(form.user, remember=form.remember.data, force=True)
-        x = 3 / 0
         flash('Your account has been created.', 'alert-success')
         return redirect(request.args.get('next') or url_for('default.home'))
     else:
+        flash_form_errors(form)
         return render_template('auth/register.html', form=form)
 
 @mod_auth.route('/login/', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        if '@' in form.username_or_email.data:
-            user = User.get_by_email(form.username_or_email.data)
-            if user is None:
-                flash('No account with that email exists!', 'alert-warning')
-                return redirect(url_for('auth.register'))
-        else:
-            user = User.get_by_username(form.username_or_email.data)
-            if user is None:
-                flash('No account with that username exists!', 'alert-warning')
-                return redirect(url_for('auth.register'))
-
-        if not user.check_password(form.password.data):
-            flash('Incorrect password! Try again?', 'alert-danger')
-            return render_template('auth/login.html', form=form)
-
         # User has authenticated. Log in.
         flash('Welcome back to ChatSchoolette!', 'alert-success')
-        login_user(user, remember=form.remember.data, force=True)
+        login_user(form.user, remember=form.remember.data, force=True)
         return redirect(request.args.get('next') or url_for('default.home'))
     else:
+        flash_form_errors(form)
         return render_template('auth/login.html', form=form)
 
 @mod_auth.route('/logout/', methods=['POST'])
@@ -115,6 +101,7 @@ def reset(key):
         login_user(form.user, force=True)
         return redirect(url_for('default.home'))
     else:
+        flash_form_errors(form)
         form.reset_key.data = key
         return render_template('auth/reset.html', form=form)
 
@@ -127,6 +114,6 @@ def activate(key):
         flash('Your account is now activated! Get chatting!', 'alert-success')
         return redirect(url_for('default.home'))
     else:
+        flash_form_errors(form)
         form.activation_key.data = key
         return render_template('auth/activate.html', form=form)
-

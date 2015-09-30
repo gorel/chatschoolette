@@ -15,4 +15,5 @@ from chatschoolette.mod_chat.models import (
     ChatRoom,
 )
 
+# This won't recreate the db, so safe to run again
 db.create_all()

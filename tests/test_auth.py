@@ -94,5 +94,3 @@ class AuthTestCase(unittest.TestCase):
 
         user = User.query.filter_by(username=username).first()
         assert user is None
-
-    # TODO: Write more tests!

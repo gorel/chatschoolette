@@ -15,7 +15,7 @@ from werkzeug import (
 )
 
 # Create the default module blueprint
-mod_default = Blueprint('default', __name__, url_prefix='')
+mod_default = Blueprint('default', __name__)
 
 # Set all routing for the default app (not within modules)
 @mod_default.route('/')

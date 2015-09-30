@@ -56,7 +56,7 @@ def ban(user_id):
         )
     else:
         flash(
-            "User %r has been banned." % user.username,
+            "User %s has been banned." % user.username,
             "alert-success",
         )
         user.messages = []

@@ -13,6 +13,8 @@ from chatschoolette.mod_chat.models import (
     ChatMessage,
     ChatQueue,
     ChatRoom,
+    PrivateChat,
+    PrivateMessage,
 )
 
 # This won't recreate the db, so safe to run again

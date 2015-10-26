@@ -1,0 +1,61 @@
+{% extends 'layout.html' %}
+{% block body %}
+    <div class="page-header">
+        <h1>
+            Chatting with {{ other_user.username }}
+            <a href="{{url_for('account.home') }}" class="pull-right btn btn-info">My Account</a>
+            <a href="{{ url_for('account.friends_list') }}" class="pull-right btn btn-info">Friends</a>
+        </h1>
+    </div>
+    <br>
+    {% if current_user.profile.has_profile_picture %}
+    <img
+        src="{{ url_for('static', filename=('profile_pictures/' + current_user.username)) }}"
+        style="max-width: 100px; height: auto;"
+    >
+    {% else %}
+    <img
+        src="{{ url_for('static', filename='profile_pictures/default') }}"
+        style="max-width: 100px; height: auto;"
+    >
+    {% endif %}
+
+    {% if other_user.profile.has_profile_picture %}
+    <img
+        src="{{ url_for('static', filename=('profile_pictures/' + other_user.username)) }}"
+        style="max-width: 100px; height: auto;"
+        class="pull-right"
+    >
+    {% else %}
+    <img
+        src="{{ url_for('static', filename='profile_pictures/default') }}"
+        style="max-width: 100px; height: auto;"
+        class="pull-right"
+    >
+    {% endif %}
+
+    <table class="table borderless">
+        <thead>
+            <th>Sender</th>
+            <th>Message</th>
+            <th>Timestamp</th>
+        </thead>
+        <tbody>
+            {% for message in chat.messages %}
+            <tr>
+                <td>{{ message.sender.username }}</td>
+                <td>{{ message.text }}</td>
+                <td>{{ message.timestamp }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <br><br>
+    <form method="POST" action="{{ url_for('account.view_chat', chat_id=chat.id) }}">
+        {{ form.csrf_token }}
+        {{ form.message_text }}
+        <button type="submit">Send</button>
+    </form>
+
+{% endblock %}

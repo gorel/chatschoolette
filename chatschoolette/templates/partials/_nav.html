@@ -21,6 +21,25 @@
         <li><a href="/about/">About</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
+        {% if current_user.notifications %}
+        <li class="pull-right dropdown">
+            <button href="#" class="dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                New notification!
+                <span class="glyphicon glyphicon-hand-down"></span>
+            </button>
+            <ul class="dropdown-menu">
+                {% for notification in current_user.notifications %}
+                <li>
+                    <a href="{{ url_for('auth.clear', nid=notification.id, next=notification.url) }}">{{ notification.text }}
+                    {% if notification.url %}
+                    <br>Click here to view
+                    {% endif %}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
         {% if current_user.is_authenticated %}
             {% if current_user.is_admin %}
             <li><a href="/admin/home/">Admin Controls</a></li>

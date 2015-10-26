@@ -213,7 +213,7 @@ class LoginForm(Form):
             ).first()
 
         if user is None:
-            self.username_or_emails.errors.append(
+            self.username_or_email.errors.append(
                 "No account with that username or email found!"
             )
             return False
@@ -221,6 +221,13 @@ class LoginForm(Form):
         if not user.check_password(self.password.data):
             self.password.errors.append(
                 "Incorrect password!"
+            )
+            return False
+
+        if user.banned:
+            self.username_or_email.errors.append(
+                "Your account has been banned because you are a horrible person! "
+                "Maybe you should think about this in the future."
             )
             return False
 

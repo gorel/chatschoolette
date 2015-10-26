@@ -4,7 +4,7 @@
         <h1>Administrator Controls</h1>
     </div>
 
-    <table class="table-responsive">
+    <table class="table table-responsive">
     {% for user in users %}
         <tr>
             <td>
@@ -17,6 +17,7 @@
             <td class="col-md-2">{{ user.username }}</td>
             <td class="col-md-6">{{ user.profile.body|truncate }}</td>
             <td class="col-md-3"><a href="/account/{{ user.profile.id }}" class="btn btn-danger">View Profile</a></td>
+            <td class="col-md-3"><a href="{{ url_for('admin.view_chat_logs', user_id=user.id) }}" class="btn btn-primary">View Chat Logs</a></td>
             <form method="POST" action="/admin/reset_password/{{ user.id }}/">
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                 <td class="col-md-3"><button type="submit" class="btn btn-warning">Reset Password</button></td>

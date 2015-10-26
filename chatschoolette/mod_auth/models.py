@@ -25,11 +25,24 @@ from chatschoolette.mod_account.models import (
 from chatschoolette.mod_chat.models import (
     ChatMessage,
     ChatQueue,
+    PrivateChat,
 )
 
 @login_manager.user_loader
 def user_loader(user_id):
     return User.query.get(user_id)
+
+friends_table = db.Table(
+    'friends_table',
+    db.Column('friend1_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('friend2_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+)
+
+private_chats_table = db.Table(
+    'private_chats_table',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('private_chat_id', db.Integer, db.ForeignKey('private_chat.id'), primary_key=True),
+)
 
 class User(db.Model):
     __tablename__ = 'user'
@@ -40,6 +53,7 @@ class User(db.Model):
     password = db.Column(db.String(64))
     is_admin = db.Column(db.Boolean)
     _is_active = db.Column(db.Boolean)
+    banned = True
 
     activation_key = db.relationship(
         'ActivationKey',
@@ -67,13 +81,32 @@ class User(db.Model):
         uselist=False,
         backref='user',
     )
+    friends = db.relationship(
+        'User',
+        secondary=friends_table,
+        primaryjoin=id==friends_table.c.friend1_id,
+        secondaryjoin=id==friends_table.c.friend2_id,
+    )
+    private_chats = db.relationship(
+        'PrivateChat',
+        secondary=private_chats_table,
+        backref='users',
+    )
+    notifications = db.relationship(
+        'Notification',
+        backref='user',
+    )
 
     def __init__(self, username, email, password, is_admin=False):
         self.username = username
         self.email = email
         self.password = generate_password_hash(password)
         self.is_admin = is_admin
+        self.friends = []
+        self.private_chats = []
+        self.notifications = []
         self._is_active = False
+        self.banned = False
         self.activation_key = ActivationKey()
 
         # Call the method to load local variables NOT stored in the db
@@ -106,6 +139,10 @@ class User(db.Model):
 
     def get_id(self):
         return self.id
+
+    def notify(self, text, url=None):
+        self.notifications.append(Notification(user=self, text=text, url=url))
+        db.session.commit()
 
     def __repr__(self):
         return '<User %r>' % self.username
@@ -184,3 +221,19 @@ class ActivationKey(db.Model):
 
     def __repr__(self):
         return '<ActivationKey for %r>' % self.user.username
+
+class Notification(db.Model):
+    __tablename__ = 'notification'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), index=True)
+    text = db.Column(db.String(256))
+    url = db.Column(db.String(128))
+
+    def __init__(self, user, text, url=None):
+        self.user = user
+        self.text = text
+        self.url = url
+
+    def __repr__(self):
+        return '<Notification: %r>' % self.text
+

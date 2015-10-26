@@ -36,7 +36,7 @@ def home():
             "alert-warning",
         )
         return redirect(url_for('default.home'))
-    users = User.query.filter(User.id != current_user.id)
+    users = User.query.filter(User.id != current_user.id).filter(User.banned == False).all()
     return render_template('admin/home.html', users=users)
 
 @mod_admin.route('/ban/<int:user_id>/', methods=['POST'])
@@ -60,10 +60,11 @@ def ban(user_id):
             "alert-success",
         )
         user.messages = []
-        db.session.delete(user.queue_position)
-        db.session.delete(user.pw_reset)
-        db.session.delete(user.profile)
-        db.session.delete(user)
+        if user.queue_position:
+            db.session.delete(user.queue_position)
+        if user.pw_reset:
+            db.session.delete(user.pw_reset)
+        user.banned = True
         db.session.commit()
 
     return redirect(url_for('admin.home'))
@@ -91,3 +92,23 @@ def reset_password(user_id):
         )
 
     return redirect(url_for('admin.home'))
+
+@mod_admin.route('/view_chat_logs/<int:user_id>', methods=['GET'])
+@mod_admin.route('/view_chat_logs/<int:user_id>/', methods=['GET'])
+@login_required
+def view_chat_logs(user_id):
+    if not current_user.is_admin:
+        flash(
+            "Sorry! You don't have permission to view that page.",
+            "alert-warning",
+        )
+        return redirect(url_for('default.home'))
+    user = User.query.get(user_id)
+    if user is None:
+        flash(
+            "No user with that user_id found!",
+            "alert-warning",
+        )
+        return redirect(url_for('admin.home'))
+    else:
+        return render_template('admin/chat_logs.html', user=user)

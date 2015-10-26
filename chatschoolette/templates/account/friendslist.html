@@ -1,0 +1,30 @@
+{% extends 'layout.html' %}
+{% block body %}
+    <div class="page-header">
+        <h1>My Friends</h1>
+    </div>
+
+    {% if current_user.friends %}
+    <table class="table-responsive">
+    {% for user in current_user.friends %}
+        <tr>
+            <td>
+            {% if user.profile.has_profile_picture %}
+            <img src="{{ url_for('static', filename='profile_pictures/' + user.username) }}" style="max-width: 100px; height: auto;">
+            {% else %}
+            <img src="{{ url_for('static', filename='profile_pictures/default') }}" style="max-width: 100px; height: auto;">
+            {% endif %}
+            </td>
+            <td class="col-md-2">{{ user.username }}</td>
+            <td class="col-md-6">{{ user.profile.body|truncate }}</td>
+            <td class="col-md-3"><a href="/account/{{ user.profile.id }}" class="btn btn-danger">View Profile</a></td>
+        </tr>
+    {% endfor %}
+    <table>
+    {% else %}
+    <h3>
+        Aww, it looks like you have no friends :( <small>Can't say I'm surprised...</small>
+        Get out there and go make some friends!
+    </h3>
+    {% endif %}
+{% endblock %}

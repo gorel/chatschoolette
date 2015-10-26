@@ -36,6 +36,10 @@ from chatschoolette.mod_auth.models import (
     User,
 )
 
+from chatschoolette.mod_chat.models import (
+    PrivateChat,
+)
+
 class EditAccountForm(Form):
     def __init__(self, *args, **kwargs):
         Form.__init__(self, *args, **kwargs)
@@ -104,7 +108,8 @@ class SearchForm(Form):
         if not Form.validate(self):
             res = False
 
-        query = User.query.join(Profile).join((Interest, Profile.interests))
+        query = User.query.join(Profile)
+        query = query.filter(User.id != current_user.id)
         query = query.filter(Profile.domain == current_user.profile.domain)
 
         if self.username.data.strip() != '':
@@ -118,7 +123,7 @@ class SearchForm(Form):
 
         interests = filter(None, self.interests_text.data.splitlines())
         if len(interests) > 0:
-            query = query.filter(
+            query = query.join(Interest, Profile.interests).filter(
                 or_(
                     Interest.name == interest
                     for interest in interests
@@ -145,3 +150,19 @@ class SearchForm(Form):
         default=3,
         coerce=int,
     )
+
+class SendMessageForm(Form):
+    def __init__(self, *args, **kwargs):
+        Form.__init__(self, *args, **kwargs)
+        self.chat = None
+        self.message = None
+
+    def validate(self):
+        res = True
+        if not Form.validate(self):
+            res = False
+
+        self.message = self.message_text.data
+        return res
+
+    message_text = TextAreaField("What's on your mind?")

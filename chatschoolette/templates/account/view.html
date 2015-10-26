@@ -1,7 +1,23 @@
 {% extends 'layout.html' %}
 {% block body %}
     <div class="page-header">
-        <h1>{{ profile.user.username }}'s account</h1>
+        <h1>{{ profile.user.username }}'s account
+        <span class="pull-right">
+            {% if profile.user in current_user.friends %}
+            <form method="POST" action="{{ url_for('account.unfriend', profile_id=profile.id) }}">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-danger">Remove Friend</button>
+            </form>
+
+            <a href="{{ url_for('account.view_chat', chat_id=chat_id) }}" class="btn btn-primary">Message</a>
+            {% else %}
+            <form method="POST" action="{{ url_for('account.friend', profile_id=profile.id) }}">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-primary">Add Friend</button>
+            </form>
+            {% endif %}
+        </span>
+    </h1>
     </div>
     {% if profile.has_profile_picture %}
     <img

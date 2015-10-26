@@ -37,6 +37,7 @@ from chatschoolette.mod_account.models import (
 )
 
 from chatschoolette.mod_auth.models import (
+    Notification,
     User,
 )
 
@@ -117,3 +118,11 @@ def activate(key):
         flash_form_errors(form)
         form.activation_key.data = key
         return render_template('auth/activate.html', form=form)
+
+@mod_auth.route('/clear/<int:nid>', methods=['GET'])
+@mod_auth.route('/clear/<int:nid>/', methods=['GET'])
+@login_required
+def clear(nid):
+    current_user.notifications.remove(Notification.query.get(nid))
+    db.session.commit()
+    return redirect(request.args.get('next') or url_for('default.home'))

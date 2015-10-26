@@ -1,3 +1,9 @@
+import datetime
+
+from flask import (
+    url_for,
+)
+
 from chatschoolette import db
 
 class ChatRoom(db.Model):
@@ -51,3 +57,61 @@ class ChatQueue(db.Model):
 
     def __repr__(self):
         return '<ChatQueue %r>' % self.user.username
+
+class PrivateChat(db.Model):
+    __tablename__ = 'private_chat'
+    id = db.Column(db.String(64), primary_key=True, index=True)
+    messages = db.relationship(
+        'PrivateMessage',
+        backref='chat',
+    )
+
+    def __init__(self, room_id, users):
+        self.id = room_id
+        self.users = users
+        self.messages = []
+
+    def send(self, sender, receiver, message):
+        self.messages.append(
+            PrivateMessage(
+                sender=sender,
+                text=message,
+            )
+        )
+        receiver.notify(
+            text='You have a new message from {}'.format(sender.username),
+            url=url_for('account.view_chat', chat_id=self.id),
+        )
+        db.session.commit()
+
+    def other_user(self, this_user):
+        for user in self.users:
+            if user is not this_user:
+                return user
+
+    @classmethod
+    def get_or_create(cls, room_id, users):
+        chat = cls.query.get(room_id)
+        if chat is None:
+            chat = PrivateChat(
+                room_id=room_id,
+                users=users,
+            )
+            db.session.add(chat)
+            db.session.commit()
+        return chat
+
+
+class PrivateMessage(db.Model):
+    __tablename__ = 'private_message'
+    id = db.Column(db.Integer, primary_key=True)
+    text = db.Column(db.String(128))
+    timestamp = db.Column(db.DateTime)
+    sender = db.relationship('User')
+    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    private_chat = db.Column(db.Integer, db.ForeignKey('private_chat.id'))
+
+    def __init__(self, sender, text, timestamp=None):
+        self.sender = sender
+        self.text = text
+        self.timestamp = timestamp or datetime.datetime.now()

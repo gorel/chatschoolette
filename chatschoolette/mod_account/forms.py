@@ -111,6 +111,7 @@ class SearchForm(Form):
         query = User.query.join(Profile)
         query = query.filter(User.id != current_user.id)
         query = query.filter(Profile.domain == current_user.profile.domain)
+        query = query.filter(User.banned == False)
 
         if self.username.data.strip() != '':
             query = query.filter(User.username == self.username.data.strip())

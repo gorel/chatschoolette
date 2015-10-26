@@ -53,7 +53,7 @@ class User(db.Model):
     password = db.Column(db.String(64))
     is_admin = db.Column(db.Boolean)
     _is_active = db.Column(db.Boolean)
-    banned = True
+    banned = False
 
     activation_key = db.relationship(
         'ActivationKey',

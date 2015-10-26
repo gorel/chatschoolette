@@ -4,4 +4,18 @@
         <h1>ChatSchoolette</h1>
     </div>
 
+    {% if current_user.is_authenticated %}
+    {% if not current_user.is_active %}
+    <table class="table borderless">
+        <tr>
+            <td><img style="max-width: 100px" src="{{ url_for('static', filename='satan.jpg') }}"></td>
+            <td>
+                <h2>Looks like you haven't activated your account yet!</h2>
+                <p>Need help with that? Click <a href="{{ url_for('auth.send_activate') }}">here</a> to resend your activation link</p>
+            </td>
+        </tr>
+    </table>
+    {% endif %}
+    {% endif %}
+
 {% endblock %}

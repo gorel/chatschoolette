@@ -7,6 +7,7 @@ from chatschoolette.mod_account.models import (
 
 from chatschoolette.mod_auth.models import (
     User,
+    PasswordReset,
 )
 
 from chatschoolette.mod_chat.models import (

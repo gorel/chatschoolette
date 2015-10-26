@@ -28,6 +28,7 @@ from chatschoolette.mod_account.models import (
 
 from chatschoolette.mod_auth.models import (
     User,
+    PasswordReset,
 )
 
 from chatschoolette import (
@@ -257,6 +258,17 @@ class LoginForm(Form):
     )
 
 class ForgotForm(Form):
+    def __init__(self, *args, **kwargs):
+        Form.__init__(self, *args, **kwargs)
+        self.user = None
+
+    def validate(self):
+        if not Form.validate(self):
+            return False
+
+        self.user = User.query.filter_by(email=self.email.data).first()
+        return self.user is not None
+
     email = TextField(
         'Email',
         validators=[
@@ -269,17 +281,19 @@ class ForgotForm(Form):
 
 class ResetPasswordForm(Form):
     def __init__(self, *args, **kwargs):
-        Form.__init__(self, args, kwargs)
+        Form.__init__(self, *args, **kwargs)
         self.user = None
 
     def validate(self):
         if not Form.validate(self):
             return False
 
-        self.user = PasswordReset.query.filter_by(key=self.reset_key.data).user
-        if self.user is None:
+        pw = PasswordReset.query.filter_by(key=self.key.data).first()
+        if not pw:
+            self.password.errors.append('Bad password reset key')
             return False
 
+        self.user = pw.user
         return True
 
     password = PasswordField(
@@ -304,7 +318,7 @@ class ResetPasswordForm(Form):
         ],
     )
 
-    reset_key = HiddenField()
+    key = HiddenField()
 
 
 class ActivateAccountForm(Form):

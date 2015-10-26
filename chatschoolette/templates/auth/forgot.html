@@ -1,0 +1,17 @@
+{% from "partials/_formhelper.html" import render_field %}
+
+{% extends 'layout.html' %}
+{% block body %}
+    <div class="page-header">
+        <h1>Forgot my password</h1>
+    </div>
+
+    <form method="POST" action="/auth/forgot/">
+        {{ form.hidden_tag() }}
+        <dl>
+            {{ render_field(form.email) }}
+        </dl>
+        <p><input type="submit" value="Send Reset Link"></p>
+    </form>
+
+{% endblock %}

@@ -25,7 +25,7 @@
         style="max-width: 300px; height: auto;"
     >
     {% else %}
-    <img src="{{ url_for('static', filename='profile_pictures/default') }}" style="max-width: 300px; height: auto;">
+    <img src="{{ url_for('static', filename='default.png') }}" style="max-width: 300px; height: auto;">
     {% endif %}
 
     <h2>About {{ profile.user.username }}</h2>

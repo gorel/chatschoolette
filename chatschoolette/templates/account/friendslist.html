@@ -12,7 +12,7 @@
             {% if user.profile.has_profile_picture %}
             <img src="{{ url_for('static', filename='profile_pictures/' + user.username) }}" style="max-width: 100px; height: auto;">
             {% else %}
-            <img src="{{ url_for('static', filename='profile_pictures/default') }}" style="max-width: 100px; height: auto;">
+            <img src="{{ url_for('static', filename='default.png') }}" style="max-width: 100px; height: auto;">
             {% endif %}
             </td>
             <td class="col-md-2">{{ user.username }}</td>

@@ -7,6 +7,10 @@ from flask import (
     url_for,
 )
 
+from flask_mail import (
+    Message,
+)
+
 from flask.ext.login import (
     current_user,
     login_required,
@@ -20,25 +24,28 @@ from werkzeug import (
 )
 
 # Import main DB and Login Manager for app
-from chatschoolette import db, login_manager, flash_form_errors
+from chatschoolette import db, mail, login_manager, flash_form_errors
 
 # Import forms
 from chatschoolette.mod_auth.forms import (
     ActivateAccountForm,
+    ForgotForm,
     LoginForm,
     RegistrationForm,
+    ResetPasswordForm,
 )
 
 # Import models
 from chatschoolette.mod_account.models import (
     Interest,
     Profile,
-    profile_interests,
 )
 
 from chatschoolette.mod_auth.models import (
     Notification,
     User,
+    PasswordReset,
+    ActivationKey,
 )
 
 # Create a blueprint for this module
@@ -103,21 +110,8 @@ def reset(key):
         return redirect(url_for('default.home'))
     else:
         flash_form_errors(form)
-        form.reset_key.data = key
-        return render_template('auth/reset.html', form=form)
-
-@mod_auth.route('/activate/<key>', methods=['GET', 'POST'])
-def activate(key):
-    form = ActivateAccountForm()
-    if form.validate_on_submit():
-        form.user.set_active()
-        db.session.commit()
-        flash('Your account is now activated! Get chatting!', 'alert-success')
-        return redirect(url_for('default.home'))
-    else:
-        flash_form_errors(form)
-        form.activation_key.data = key
-        return render_template('auth/activate.html', form=form)
+        form.key.data = key
+        return render_template('auth/reset.html', form=form, key=key)
 
 @mod_auth.route('/clear/<int:nid>', methods=['GET'])
 @mod_auth.route('/clear/<int:nid>/', methods=['GET'])
@@ -126,3 +120,50 @@ def clear(nid):
     current_user.notifications.remove(Notification.query.get(nid))
     db.session.commit()
     return redirect(request.args.get('next') or url_for('default.home'))
+
+@mod_auth.route('/forgot', methods=['GET', 'POST'])
+@mod_auth.route('/forgot/', methods=['GET', 'POST'])
+@mod_auth.route('/forgot/<key>', methods=['GET', 'POST'])
+@mod_auth.route('/forgot/<key>/', methods=['GET', 'POST'])
+def forgot(key=None):
+    pw = PasswordReset.query.filter_by(key=key or 'invalid').first()
+    if pw:
+        form = ResetPasswordForm()
+        if form.validate_on_submit():
+            form.user.reset_password(form.password)
+            db.session.commit()
+            login_user(form.user, remember=True)
+            flash('Your password has been reset!', 'alert-success')
+            return redirect(url_for('default.home'))
+        else:
+            return render_template('auth/reset.html', key=key, form=form)
+    else:
+        form = ForgotForm()
+        if form.validate_on_submit():
+            form.user.send_password_reset()
+            flash('A password reset link has been sent to your email.', 'alert-success')
+            return redirect(url_for('default.home'))
+        else:
+            return render_template('auth/forgot.html', form=form, key=key)
+
+
+@mod_auth.route('/activate/<key>', methods=['GET'])
+@mod_auth.route('/activate/<key>/', methods=['GET'])
+@login_required
+def activate(key):
+    activation = ActivationKey.query.filter_by(key=key).first()
+    if not activation:
+        flash("I don't understand what you are looking for...", 'alert-warning')
+    else:
+        activation.user.is_active = True
+        db.session.commit()
+        flash('You are now active!!!! Yay!', 'alert-danger')
+    return redirect(url_for('default.home'))
+
+@mod_auth.route('/send_activate', methods=['GET'])
+@mod_auth.route('/send_activate/', methods=['GET'])
+@login_required
+def send_activate():
+    current_user.send_activation_key()
+    flash('An email has been sent with activation instuctions!', 'alert-success')
+    return redirect(url_for('default.home'))

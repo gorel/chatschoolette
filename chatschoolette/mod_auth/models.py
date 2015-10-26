@@ -1,9 +1,14 @@
+import os
 import random
 import string
 
 
 from flask.ext.sqlalchemy import (
     orm,
+)
+
+from flask_mail import (
+    Message,
 )
 
 from werkzeug.security import (
@@ -13,6 +18,7 @@ from werkzeug.security import (
 
 from chatschoolette import (
     db,
+    mail,
     login_manager,
 )
 
@@ -108,6 +114,7 @@ class User(db.Model):
         self._is_active = False
         self.banned = False
         self.activation_key = ActivationKey()
+        self.send_activation_key()
 
         # Call the method to load local variables NOT stored in the db
         self.init_on_load()
@@ -147,6 +154,19 @@ class User(db.Model):
     def __repr__(self):
         return '<User %r>' % self.username
 
+    def send_activation_key(self):
+        title = 'Activate your ChatSchoolette account NOW!'
+        content = 'Please go to this link: '
+        url = '{site}/auth/activate/{key}'.format(
+            site=os.environ['SITE_URL'],
+            key=self.activation_key.key,
+        )
+        sender = 'cs490testing@gmail.com'
+        recipient = self.email
+        msg = Message(title, sender=sender, recipients=[recipient])
+        msg.body = content + url
+        mail.send(msg)
+
     def send_password_reset(self):
         pw_reset = PasswordReset(
             user_id=self.id,
@@ -158,7 +178,17 @@ class User(db.Model):
         )
         db.session.add(pw_reset)
         db.session.commit()
-        # TODO: Send email!
+        title = 'Reset your ChatSchoolette Password NOW!'
+        content = 'Please go to this link: '
+        url = '{site}/auth/register/{key}'.format(
+            site=os.environ['SITE_URL'],
+            key=pw_reset.key,
+        )
+        sender = 'cs490testing@gmail.com'
+        recipient = self.email
+        msg = Message(title, sender=sender, recipients=[recipient])
+        msg.body = content + url
+        mail.send(msg)
 
     def reset_password(self, new_pw):
         pw_reset = PasswordReset.query.filter_by(user_id=self.id).first()

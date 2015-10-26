@@ -115,3 +115,7 @@ class PrivateMessage(db.Model):
         self.sender = sender
         self.text = text
         self.timestamp = timestamp or datetime.datetime.now()
+
+    @property
+    def ftime(self):
+        return self.timestamp.strftime('%m/%d/%Y at %I:%M %p')

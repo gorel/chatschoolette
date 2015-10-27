@@ -41,6 +41,7 @@ def home():
         return redirect(url_for('default.home'))
 
     form = StartChatForm()
+    form.domain.data = current_user.profile.domain
     # The user is loading the chat select screen and doesn't have a match yet
     if form.validate_on_submit():
         if form.is_video:

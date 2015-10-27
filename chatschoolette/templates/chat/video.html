@@ -4,6 +4,12 @@
     <h1>Video Chat</h1>
 </div>
 
+<table class="table borderless">
+    <tr>
+        <td><div id="publisher"></div></td>
+        <td><div id="subscriber"><b>Waiting for a friend!</b></div></td>
+    </tr>
+
 <script type="text/javascript" charset="utf-8">
     $(document).ready(function(){
         $("#link").attr('value',document.URL);
@@ -15,8 +21,14 @@
     session.connect({{api_key}}, "{{token}}");
 
     function sessionConnectedHandler(event) {
+        var pub_opts = {
+            insertMode: 'append',
+            width: 400,
+            height: 300
+        }
+        var publisher = OT.initPublisher('publisher', pub_opts);
         subscribeToStreams(event.streams);
-        session.publish();
+        session.publish(publisher);
     }
 
     function streamCreatedHandler(event) {
@@ -24,11 +36,17 @@
     }
 
     function subscribeToStreams(streams) {
+        var sub_opts = {
+            insertMode: 'append',
+            width: 800,
+            height: 600
+        }
         for (var i = 0; i < streams.length; i++) {
             var stream = streams[i];
+            document.getElementById('subscriber').innerHTML = '';
             console.log(stream.connection.connectionId+"&"+session.connection.connectionId);
             if (stream.connection.connectionId != session.connection.connectionId) {
-                session.subscribe(stream);
+                session.subscribe(stream, 'subscriber', sub_opts);
             }
         }
     }

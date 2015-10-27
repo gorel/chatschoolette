@@ -20,6 +20,11 @@ from wtforms import (
     validators,
 )
 
+from chatschoolette.mod_auth.models import (
+    User,
+    Profile,
+)
+
 from chatschoolette.mod_chat.models import (
     ChatRoom,
 )
@@ -37,7 +42,9 @@ class StartChatForm(Form):
 
         if self.video_button.data:
             self.is_video = True
-            for room in ChatRoom.query.all():
+            for room in ChatRoom.query.join(User, ChatRoom.users).join(Profile, User.profile).filter(
+                Profile.domain == self.domain.data
+            ):
                 if len(room.users) == 1:
                     self.room = room
             if not self.room:
@@ -51,3 +58,4 @@ class StartChatForm(Form):
 
     video_button = SubmitField('Video')
     text_button = SubmitField('Text')
+    domain = HiddenField()

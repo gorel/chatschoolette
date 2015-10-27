@@ -2,13 +2,27 @@
 {% block body %}
 <div class="page-header">
     <h1>Video Chat</h1>
+    <form action="#" onsubmit="return add_friend()">
+        <span class="pull-right" id="friendadd"></span>
+    </form>
 </div>
 
 <table class="table borderless">
     <tr>
-        <td><div id="publisher"></div></td>
-        <td><div id="subscriber"><b>Waiting for a friend!</b></div></td>
+        <td>
+            <div id="publisher"></div>
+            <div id="textchat">
+                <div id="history" style="height:300px;width:400px;overflow:auto;">
+                </div>
+                <form id = "textform" action="javascript:void(0);">
+                    <input type="text" placeholder="What's on your mind?" id="msgTxt"></input>
+                    <button type="submit">SPEAK YOUR MIND</button>
+                </form>
+            </div>
+        </td>
+        <td><div id="subscriber"><h3><b>Waiting for a friend!</b></h3></div></td>
     </tr>
+</table>
 
 <script type="text/javascript" charset="utf-8">
     $(document).ready(function(){
@@ -43,6 +57,7 @@
         }
         for (var i = 0; i < streams.length; i++) {
             var stream = streams[i];
+            document.getElementById('friendadd').innerHTML = '<button id="friendaddbutton" class="btn btn-danger" type="submit">Add friend</button>';
             document.getElementById('subscriber').innerHTML = '';
             console.log(stream.connection.connectionId+"&"+session.connection.connectionId);
             if (stream.connection.connectionId != session.connection.connectionId) {
@@ -54,6 +69,43 @@
     function exceptionHandler(event) {
         alert(event.message);
     }
+
+    var textform = document.querySelector('#textform');
+    var msgTxt = document.querySelector('#msgTxt');
+    textform.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        if (msgTxt.value.length > 0) {
+            session.signal({
+                type: 'chat',
+                data: "{{ current_user.username }}: " + msgTxt.value,
+                sender: "{{ current_user.username}}"
+            },
+            function(error) {
+                if (!error) {
+                    msgTxt.value = '';
+                }
+            });
+        }
+    });
+
+    var msgHistory = document.querySelector('#history');
+    session.on('signal:chat', function(event) {
+        var msg = document.createElement('p');
+        msg.innerHTML = event.data;
+        msg.className = event.from.connectionId === session.connection.connectionId ? 'mine' : 'theirs';
+        msgHistory.appendChild(msg);
+        msg.scrollIntoView();
+    });
+
+    function add_friend() {
+        console.log('Adding friend.');
+        // TODO: JQuery callback stuff!
+        alert('You are now friends with !');
+        document.getElementById('friendaddbutton').disabled = true;
+        return false;
+    }
+
 </script>
 
 {% endblock %}

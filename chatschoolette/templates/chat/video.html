@@ -1,28 +1,41 @@
 {% extends 'layout.html' %}
 {% block body %}
-    <div class="page-header">
-        <h1>Video Chat</h1>
-    </div>
+<div class="page-header">
+    <h1>Video Chat</h1>
+</div>
 
-    <div id="vid-box"></div>
+<script type="text/javascript" charset="utf-8">
+    $(document).ready(function(){
+        $("#link").attr('value',document.URL);
+    })
+    TB.addEventListener("exception", exceptionHandler);
+    var session = TB.initSession("{{session_id}}");
+    session.addEventListener("sessionConnected", sessionConnectedHandler);
+    session.addEventListener("streamCreated", streamCreatedHandler);
+    session.connect({{api_key}}, "{{token}}");
 
-    <script src="https://cdn.pubnub.com/pubnub-3.7.14.min.js"></script>
-    <script src="https://cdn.pubnub.com/webrtc/webrtc.js"></script>
-    <script>
-        var phone = window.phone = PHONE({
-            number: "{{ current_user.username }}",
-            publish_key: "{{ publish_key }}",
-            subscribe_key: "{{ subscribe_key }}",
-        });
-        phone.receive(function(session){
-            session.connected(function(session) { video_out.appendChild(session.video); });
-            session.ended(function(session) { video_out.innerHTML=''; });
-        });
+    function sessionConnectedHandler(event) {
+        subscribeToStreams(event.streams);
+        session.publish();
+    }
 
-        function makeCall() {
-            if (!window.phone) alert("No phone variable");
-            else phone.dial("{{ id_to_call }}");
+    function streamCreatedHandler(event) {
+        subscribeToStreams(event.streams);
+    }
+
+    function subscribeToStreams(streams) {
+        for (var i = 0; i < streams.length; i++) {
+            var stream = streams[i];
+            console.log(stream.connection.connectionId+"&"+session.connection.connectionId);
+            if (stream.connection.connectionId != session.connection.connectionId) {
+                session.subscribe(stream);
+            }
         }
-    </script>
+    }
+
+    function exceptionHandler(event) {
+        alert(event.message);
+    }
+</script>
 
 {% endblock %}

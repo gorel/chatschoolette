@@ -16,3 +16,4 @@ virtualenv==13.1.2
 Werkzeug==0.10.4
 WTForms==2.0.2
 opentok-python-sdk==0.91.2
+opentok==2.3.0

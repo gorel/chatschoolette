@@ -134,7 +134,8 @@ class User(db.Model):
 
     @is_active.setter
     def is_active(self, value):
-        db.session.delete(self.activation_key)
+        if self.activation_key:
+            db.session.delete(self.activation_key)
         self._is_active = value
 
     @property
@@ -165,7 +166,10 @@ class User(db.Model):
         recipient = self.email
         msg = Message(title, sender=sender, recipients=[recipient])
         msg.body = content + url
-        mail.send(msg)
+        try:
+            mail.send(msg)
+        except:
+            print('COULD NOT SEND EMAIL!')
 
     def send_password_reset(self):
         pw_reset = PasswordReset(
@@ -188,7 +192,10 @@ class User(db.Model):
         recipient = self.email
         msg = Message(title, sender=sender, recipients=[recipient])
         msg.body = content + url
-        mail.send(msg)
+        try:
+            mail.send(msg)
+        except:
+            print('COULD NOT SEND EMAIL!')
 
     def reset_password(self, new_pw):
         pw_reset = PasswordReset.query.filter_by(user_id=self.id).first()

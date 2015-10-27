@@ -4,11 +4,12 @@ from flask import (
     url_for,
 )
 
-from chatschoolette import db
+from chatschoolette import db, opentok
 
 class ChatRoom(db.Model):
     __tablename__ = 'chatroom'
     id = db.Column(db.Integer, primary_key=True)
+    session_id = db.Column(db.String(128))
     topic = db.Column(db.String(64))
 
     users = db.relationship(
@@ -22,9 +23,18 @@ class ChatRoom(db.Model):
 
     def __init__(self, topic=None):
         self.topic = topic
+        self.users = []
+        self.messages = []
+        self.session_id = opentok.create_session().session_id
 
     def __repr__(self):
         return '<ChatRoom #%r>' % self.id
+
+    def is_authorized_user(self, this_user):
+        for user in self.users:
+            if user.id == this_user.id:
+                return True
+        return False
 
 class ChatMessage(db.Model):
     __tablename__ = 'chatmessage'

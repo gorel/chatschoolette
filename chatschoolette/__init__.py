@@ -1,5 +1,8 @@
 # System imports
+import os
 import sys
+
+from opentok import OpenTok
 
 # Flask imports
 from flask import Flask, render_template, flash
@@ -52,6 +55,12 @@ sys.stdout.write('Done\n')
 # Set allowed uploads
 sys.stdout.write('Configuring uploads...')
 configure_uploads(app, (IMAGE_SET,))
+sys.stdout.write('Done\n')
+
+# Create OpenTok thing
+sys.stdout.write('Creating OpenTok thing...')
+sys.stdout.flush()
+opentok = OpenTok(os.environ['OPENTOK_API_KEY'], os.environ['OPENTOK_API_SECRET'])
 sys.stdout.write('Done\n')
 
 # Register Mailer service

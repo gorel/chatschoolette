@@ -91,6 +91,7 @@ def video_chat(room_id):
     token = opentok.generate_token(str(chatroom.session_id))
     return render_template(
         'chat/video.html',
+        session_id=chatroom.session_id,
         room_id=room_id,
         token=token,
         api_key=os.environ['OPENTOK_API_KEY'],

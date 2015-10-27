@@ -1,0 +1,38 @@
+{% extends 'layout.html' %}
+{% block body %}
+
+<script type="text/javascript" charset="utf-8">
+      $(document).ready(function(){
+          $("#link").attr('value',document.URL);
+        })
+      TB.addEventListener("exception", exceptionHandler);
+      var session = TB.initSession("{{session_id}}"); 
+      session.addEventListener("sessionConnected", sessionConnectedHandler);
+      session.addEventListener("streamCreated", streamCreatedHandler);
+      session.connect({{api_key}}, "{{token}}");  
+
+      function sessionConnectedHandler(event) {
+         subscribeToStreams(event.streams);
+         session.publish();
+      }
+      
+      function streamCreatedHandler(event) {
+        subscribeToStreams(event.streams);
+      }
+      
+      function subscribeToStreams(streams) {
+        for (var i = 0; i < streams.length; i++) {
+          var stream = streams[i];
+          console.log(stream.connection.connectionId+"&"+session.connection.connectionId);
+          if (stream.connection.connectionId != session.connection.connectionId) {
+            session.subscribe(stream);
+          }
+        }
+      }
+      
+      function exceptionHandler(event) {
+        alert(event.message);
+      }
+</script>
+
+{% endblock %}

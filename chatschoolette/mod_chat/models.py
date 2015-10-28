@@ -57,6 +57,10 @@ class ChatMessage(db.Model):
             self.timestamp,
         )
 
+    @property
+    def ftime(self):
+        return self.timestamp.strftime('%Y-%m-%d at %I:%M %p')
+
 class ChatQueue(db.Model):
     __tablename__ = 'chatqueue'
     id = db.Column(db.Integer, primary_key=True)

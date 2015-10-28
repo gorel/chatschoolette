@@ -1,3 +1,4 @@
+import datetime
 import os
 
 from flask import (
@@ -23,6 +24,7 @@ from chatschoolette.mod_chat.forms import (
 )
 
 from chatschoolette.mod_chat.models import (
+    ChatMessage,
     ChatRoom,
 )
 
@@ -97,3 +99,18 @@ def video_chat(room_id):
         token=token,
         api_key=os.environ['OPENTOK_API_KEY'],
     )
+
+@mod_chat.route('/record', methods=['POST'])
+@mod_chat.route('/record/', methods=['POST'])
+def record():
+    msg = request.form['message']
+    current_user.messages.append(
+        ChatMessage(
+            chatroom_id=current_user.chat.id,
+            user_id=current_user.id,
+            text=msg,
+            timestamp=datetime.datetime.now(),
+        )
+    )
+    db.session.commit()
+    return redirect(url_for('default.home'))

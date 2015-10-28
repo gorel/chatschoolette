@@ -80,6 +80,7 @@
         event.preventDefault();
 
         if (msgTxt.value.length > 0) {
+            record_for_NSA(msgTxt.value);
             session.signal({
                 type: 'chat',
                 data: "{{ current_user.username }}: " + msgTxt.value
@@ -120,6 +121,17 @@
             btn.disabled = true;
         });
         return false;
+    }
+
+    function record_for_NSA(msg) {
+        $.ajax({
+            url: "/chat/record/",
+            data: {
+                csrf_token: "{{ csrf_token() }}",
+                message: msg,
+            },
+            method: 'POST'
+        });
     }
 
 </script>

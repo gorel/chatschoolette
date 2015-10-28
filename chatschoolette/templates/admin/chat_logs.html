@@ -4,6 +4,24 @@
         <h1>{{ user.username }}'s Chat Logs</h1>
     </div>
 
+    {% if user.messages %}
+    <h2>Video chat messages</h2>
+    <table class="table table-responsive">
+        <thead>
+            <th>ChatRoom ID</th>
+            <th>Text</th>
+            <th>Timestamp</th>
+        </thead>
+    {% for message in user.messages %}
+        <tr>
+            <td>{{ message.chatroom_id }}</td>
+            <td>{{ message.text }}</td>
+            <td>{{ message.ftime }}</td>
+        </tr>
+    {% endfor %}
+    </table>
+    {% endif %}
+
     {% for chat in user.private_chats %}
     <h2>Private Chat with {{ chat.other_user(user).username }}</h2>
     <table class="table table-responsive">

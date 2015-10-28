@@ -66,6 +66,10 @@
             type: 'pic',
             data: document.getElementById('mypic').src,
         });
+        session.signal({
+            type: 'pid',
+            data: "{{ current_user.id }}"
+        });
         document.getElementById('publisher').innerHTML = '';
         document.getElementById('subscriber').innerHTML = '';
     }

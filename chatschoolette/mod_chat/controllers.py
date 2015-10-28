@@ -26,6 +26,8 @@ from chatschoolette.mod_chat.forms import (
 from chatschoolette.mod_chat.models import (
     ChatMessage,
     ChatRoom,
+    TextChatMessage,
+    TextChatRoom,
 )
 
 # Create a blueprint for this module
@@ -53,8 +55,11 @@ def home():
             db.session.commit()
             return redirect(url_for('chat.video_chat', room_id=form.room.id))
         else:
-            #Stephen pls
-            pass
+            if form.is_new:
+                db.session.add(form.room)
+            form.room.users.append(current_user)
+            db.session.commit()
+            return redirect(url_for('chat.text_chat', room_id=form.room.id))
     else:
         flash_form_errors(form)
         return render_template('chat/home.html', form=form)
@@ -94,6 +99,29 @@ def video_chat(room_id):
     token = opentok.generate_token(str(chatroom.session_id))
     return render_template(
         'chat/video.html',
+        session_id=chatroom.session_id,
+        room_id=room_id,
+        token=token,
+        api_key=os.environ['OPENTOK_API_KEY'],
+    )
+
+@mod_chat.route('/text_chat/<int:room_id>', methods=['GET'])
+@mod_chat.route('/text_chat/<int:room_id>/', methods=['GET'])
+@login_required
+def text_chat(room_id):
+    # Make sure user is authorized to be in this chat
+    chatroom = TextChatRoom.query.get(room_id)
+
+    if not chatroom or not chatroom.is_authorized_user(current_user):
+        flash(
+            "Oops! Looks like you don't belong in that chat room!",
+            "alert-warning",
+        )
+        return redirect(url_for('chat.home'))
+
+    token = opentok.generate_token(str(chatroom.session_id))
+    return render_template(
+        'chat/text.html',
         session_id=chatroom.session_id,
         room_id=room_id,
         token=token,

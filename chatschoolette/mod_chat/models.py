@@ -36,6 +36,33 @@ class ChatRoom(db.Model):
                 return True
         return False
 
+class TextChatRoom(db.Model):
+    __tablename__ = 'textchatroom'
+    id = db.Column(db.Integer, primary_key=True)
+    session_id = db.Column(db.String(128))
+    users = db.relationship(
+        'User',
+        backref='textchat',
+    )
+    messages = db.relationship(
+        'TextChatMessage',
+        backref='textchat',
+    )
+
+    def __init__(self):
+        self.users = []
+        self.messages = []
+        self.session_id = opentok.create_session().session_id
+
+    def __repr__(self):
+        return '<TextChatRoom #%r>' % self.id
+
+    def is_authorized_user(self, this_user):
+        for user in self.users:
+            if user.id == this_user.id:
+                return True
+        return False
+
 class ChatMessage(db.Model):
     __tablename__ = 'chatmessage'
     id = db.Column(db.Integer, primary_key=True)
@@ -52,6 +79,31 @@ class ChatMessage(db.Model):
 
     def __repr__(self):
         return '<ChatMessage: "%r" by %r at %r>' % (
+            self.text,
+            self.user.username,
+            self.timestamp,
+        )
+
+    @property
+    def ftime(self):
+        return self.timestamp.strftime('%Y-%m-%d at %I:%M %p')
+
+class TextChatMessage(db.Model):
+    __tablename__ = 'textchatmessage'
+    id = db.Column(db.Integer, primary_key=True)
+    chatroom_id = db.Column(db.Integer, db.ForeignKey('textchatroom.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), index=True)
+    text = db.Column(db.String(128))
+    timestamp = db.Column(db.DateTime)
+
+    def __init__(self, chatroom_id, user_id, text, timestamp):
+        self.chatroom_id = chatroom_id
+        self.user_id = user_id
+        self.text = text
+        self.timestamp = timestamp
+
+    def __repr__(self):
+        return '<TextChatMessage: "%r" by %r at %r>' % (
             self.text,
             self.user.username,
             self.timestamp,

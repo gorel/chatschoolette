@@ -1,0 +1,179 @@
+{% extends 'layout.html' %}
+{% block body %}
+<div class="page-header">
+    <h1>Text Chat</h1>
+    <form action="#" onsubmit="return add_friend()">
+        <input type="hidden" id="pid" value="0">
+        <button class="btn btn-danger pull-right" id="friendadd" disabled>Add friend</button>
+    </form>
+</div>
+
+<table class="table borderless">
+    <tr>
+        <td>
+        <h2 id="waiting">Waiting on partner...</h2>
+        <img
+            id="mypic"
+            {% if current_user.profile.has_profile_picture %}
+            src="{{ url_for('static', filename=('profile_pictures/' + current_user.username)) }}"
+            {% else %}
+            src="{{ url_for('static', filename='default.png') }}"
+            {% endif %}
+            style="max-width: 300px; height: auto;"
+        >
+        </td>
+        <td style="width: 800px">
+            <div id="textchat">
+                <div id="history" style="height:400px;width:auto;overflow:auto;">
+                </div>
+                <form id = "textform" action="javascript:void(0);">
+                    <input type="text" placeholder="What's on your mind?" id="msgTxt" style="width:500px"></input>
+                    <button type="submit">SPEAK YOUR MIND</button>
+                </form>
+            </div>
+        </td>
+        <td>
+        <img
+            id="pic"
+            src="{{ url_for('static', filename='default.png') }}"
+            style="max-width: 300px; height: auto;"
+        >
+        </td>
+    </tr>
+</table>
+
+<script type="text/javascript" charset="utf-8">
+    $(document).ready(function(){
+        $("#link").attr('value',document.URL);
+    })
+    TB.addEventListener("exception", exceptionHandler);
+    var session = TB.initSession("{{session_id}}");
+    session.addEventListener("sessionConnected", sessionConnectedHandler);
+    session.addEventListener("streamCreated", streamCreatedHandler);
+    session.connect({{api_key}}, "{{token}}");
+
+    function sessionConnectedHandler(event) {
+        var pub_opts = {
+            videoSource: null,
+            insertMode: 'append',
+            width: 1,
+            height: 1
+        }
+        var publisher = OT.initPublisher('publisher', pub_opts);
+        subscribeToStreams(event.streams);
+        session.publish(publisher);
+        session.signal({
+            type: 'pic',
+            data: document.getElementById('mypic').src,
+        });
+        document.getElementById('publisher').innerHTML = '';
+        document.getElementById('subscriber').innerHTML = '';
+    }
+
+    function streamCreatedHandler(event) {
+        subscribeToStreams(event.streams);
+    }
+
+    function subscribeToStreams(streams) {
+        var sub_opts = {
+            subscribeToAudio: false,
+            subscribeToVideo: false,
+            insertMode: 'append',
+            width: 1,
+            height: 1
+        }
+        for (var i = 0; i < streams.length; i++) {
+            var stream = streams[i];
+            document.getElementById('waiting').innerHTML = '';
+            console.log(stream.connection.connectionId+"&"+session.connection.connectionId);
+            if (stream.connection.connectionId != session.connection.connectionId) {
+                session.subscribe(stream, 'subscriber', sub_opts);
+                session.signal({
+                    type: 'pid',
+                    data: "{{ current_user.id }}"
+                });
+                session.signal({
+                    type: 'pic',
+                    data: document.getElementById('mypic').src,
+                });
+                document.getElementById('publisher').innerHTML = '';
+                document.getElementById('subscriber').innerHTML = '';
+            }
+        }
+    }
+
+    function exceptionHandler(event) {
+        alert(event.message);
+    }
+
+    var textform = document.querySelector('#textform');
+    var msgTxt = document.querySelector('#msgTxt');
+    textform.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        if (msgTxt.value.length > 0) {
+            record_for_NSA(msgTxt.value);
+            session.signal({
+                type: 'chat',
+                data: "{{ current_user.username }}: " + msgTxt.value
+            },
+            function(error) {
+                if (!error) {
+                    msgTxt.value = '';
+                }
+            });
+        }
+    });
+
+    var msgHistory = document.querySelector('#history');
+    session.on('signal:chat', function(event) {
+        var msg = document.createElement('p');
+        msg.innerHTML = event.data;
+        msg.className = event.from.connectionId === session.connection.connectionId ? 'mine' : 'theirs';
+        msgHistory.appendChild(msg);
+        msg.scrollIntoView();
+    });
+
+    session.on('signal:pid', function(event) {
+        if (event.from.connectionId != session.connection.connectionId) {
+            document.getElementById('friendadd').disabled = false;
+            var pid = document.getElementById('pid').value = event.data;
+        }
+    });
+
+    session.on('signal:pic', function(event) {
+        if (event.from.connectionId != session.connection.connectionId) {
+            document.getElementById('pic').src = event.data;
+        }
+    });
+
+    function add_friend() {
+        var pid = document.querySelector('#pid');
+        var btn = document.querySelector('#friendadd');
+        $.ajax({
+            url: "/account/friend/" + pid.value + "/",
+            data: {csrf_token: "{{ csrf_token() }}"},
+            method: 'POST'
+        }).done(function() {
+            btn.innerHTML = 'Friend added!';
+            btn.disabled = true;
+        });
+        return false;
+    }
+
+    function record_for_NSA(msg) {
+        $.ajax({
+            url: "/chat/record/",
+            data: {
+                csrf_token: "{{ csrf_token() }}",
+                message: msg,
+            },
+            method: 'POST'
+        });
+    }
+
+</script>
+<div id="publisher" style:"display: none;"></div>
+<div id="subscriber" style:"display: none;"></div>
+
+{% endblock %}

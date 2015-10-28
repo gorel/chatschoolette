@@ -54,6 +54,7 @@ class User(db.Model):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
     chatroom_id = db.Column(db.Integer, db.ForeignKey('chatroom.id'))
+    textchatroom_id = db.Column(db.Integer, db.ForeignKey('textchatroom.id'))
     username = db.Column(db.String(32), index=True, unique=True)
     email = db.Column(db.String(64), index=True, unique=True)
     password = db.Column(db.String(64))

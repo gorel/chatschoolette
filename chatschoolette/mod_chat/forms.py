@@ -27,6 +27,7 @@ from chatschoolette.mod_auth.models import (
 
 from chatschoolette.mod_chat.models import (
     ChatRoom,
+    TextChatRoom,
 )
 
 class StartChatForm(Form):
@@ -52,6 +53,14 @@ class StartChatForm(Form):
                 self.room = ChatRoom()
         else:
             # Do all of Stephen's witchcraft and sorcery here
+            for room in TextChatRoom.query.join(User, TextChatRoom.users).join(Profile, User.profile).filter(
+                Profile.domain == self.domain.data
+            ):
+                if len(room.users) == 1:
+                    self.room = room
+            if not self.room:
+                self.is_new = True
+                self.room = TextChatRoom()
             pass
 
         return True

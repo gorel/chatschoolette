@@ -14,6 +14,8 @@ from chatschoolette.mod_chat.models import (
     ChatMessage,
     ChatQueue,
     ChatRoom,
+    TextChatRoom,
+    TextChatMessage,
     PrivateChat,
     PrivateMessage,
 )

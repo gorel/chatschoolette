@@ -9,20 +9,48 @@
     <form method="POST" action="/auth/register/" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
         <dl>
+	<div class='row register'>
             {{ render_field(form.username) }}
+	</div>
+	<div class='row register'>
             {{ render_field(form.email) }}
+	</div>
+	<div class='row register'>
             {{ render_field(form.confirm_email) }}
+	</div>
+	<div class='row register'>
             {{ render_field(form.password) }}
+	</div>
+	<div class='row register'>
             {{ render_field(form.confirm_password) }}
+	</div>
+	<div class='row register'>
             {{ render_field(form.gender) }}
+	</div>
+	<div class='row register'>
             {{ render_field(form.birthdate) }}
-            {{ render_field(form.profile_picture) }}
+	</div>
+	<div class='row register'>
             {{ render_field(form.profile_description) }}
+	</div>
+	<div class='row register'>
             {{ render_field(form.interests_text) }}
+	</div>
+	<div class='row register'>
+            {{ render_field(form.profile_picture) }}
+	</div>
+	<div class='row register'>
             {{ render_field(form.remember) }}
+	</div>
+	<div class='row register'>
             {{ render_field(form.recaptcha) }}
+	</div>
         </dl>
-        <p><input type="submit" value="Register"></p>
+	<div class='row'>
+        <p>
+			<input type="submit" value="Register"/>
+		</p>
+	</div>
     </form>
 
 {% endblock %}

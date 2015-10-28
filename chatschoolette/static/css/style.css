@@ -1,3 +1,90 @@
+/*changes color of background to light red*/
 body {
   background: #f7f7f7;
+}
+
+/* remove bullets from ul */
+ul {
+	list-style-type: none;
+}
+
+/* little neater space in descript list */
+dt {
+	padding-top: 5px;
+	padding-right: 5px;
+}
+
+
+/*makes button width a min*/
+input[type="submit"] {
+    min-width: 75px;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="date"],
+textarea
+{
+	float: right;
+	margin-right: 10%;
+}
+
+/*changes hover of buttons*/
+input[type="checkbox"]:hover, 
+input[type="radio"]:hover, 
+input[type="file"]:hover
+{
+	cursor:pointer;
+}
+
+/*changes space around border*/
+.page-header {
+	margin: 0 auto;
+}
+
+/*changes color of top nav bar*/
+.navbar-default .navbar-brand:hover, 
+.navbar-default .navbar-brand:focus {
+	color: #aaa;
+}
+
+/*changes color of backgground*/
+body {
+	background: #C59090;
+}
+
+/*fixes menu spacing when minimizing browser or use in phone*/
+@media(max-width: 768px){
+	.navbar-default .navbar-nav>li>a {
+		text-align: left;
+	}
+}
+
+/*fixes all labels*/
+label { 
+	float:left; 
+	padding-right: 10px;
+}
+
+/*excludes radiobuttons for floats*/
+label[for*=gender] { 
+	float: none; 
+}
+
+/*changes margins on all rows*/
+.row {
+	margin-left: 5%;
+	padding: 3px 0px 3px 0px;
+}
+
+/*changes colors of errors*/
+.errors {
+	color: #9f6000;
+}
+
+/*fix alignment of submit*/
+input[type=submit] {
+	float: right;
+    margin-right: 12%;
+}
 }

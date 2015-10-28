@@ -9,12 +9,27 @@
     <form method="POST" action="/auth/login/">
         {{ form.hidden_tag() }}
         <dl>
+	<div class='row login'>
             {{ render_field(form.username_or_email) }}
+	</div>
+	<div class='row login'>
             {{ render_field(form.password) }}
+	</div>
+	<div class='row login'>
             {{ render_field(form.remember) }}
+	</div>
         </dl>
-        <p><input type="submit" value="Register"></p>
+	<div class='row login'>
+	    <p>
+			<input type="submit" value="Login"/>
+		</p>
+	</div>
     </form>
-    <p><a href="{{ url_for('auth.forgot') }}">I forgot my password D:</a></p>
-
+    <div class='row login'>
+		<p>
+			<a href="{{ url_for('auth.forgot') }}">
+				I forgot my password D:
+			</a>
+		</p>
+	</div>
 {% endblock %}

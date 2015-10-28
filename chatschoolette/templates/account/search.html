@@ -5,17 +5,29 @@
     <div class="page-header">
         <h1>Search for users</h1>
     </div>
-
+<div class='search_container'>
     <form method="POST" action="/account/search/">
         {{ form.hidden_tag() }}
         <dl>
+		<div class='row search'>
             {{ render_field(form.username) }}
+		</div>
+		<div class='row search'>
             {{ render_field(form.email) }}
+		</div>
+		<div class='row search'>
             {{ render_field(form.gender) }}
+		</div>
+		<div class='row search'>
             {{ render_field(form.interests_text) }}
+		</div>
         </dl>
-        <p><input type="submit" value="Search"></p>
+		<div class='row search'>
+        	<p>
+				<input class='btn btn-default' type="submit" value="Search"/>
+			</p>
+		</div>
         </dl>
     </form>
-
+</div>
 {% endblock %}

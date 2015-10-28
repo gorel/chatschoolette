@@ -14,6 +14,10 @@ dt {
 	padding-right: 5px;
 }
 
+.logout_btn {
+	margin-top: 8px;
+	margin-right: -25px;
+}
 
 /*makes button width a min*/
 input[type="submit"] {
@@ -27,6 +31,8 @@ textarea
 {
 	float: right;
 	margin-right: 10%;
+	border: solid 2px black;
+    border-radius: 5px;
 }
 
 /*changes hover of buttons*/
@@ -83,8 +89,68 @@ label[for*=gender] {
 }
 
 /*fix alignment of submit*/
-input[type=submit] {
+input[type=submit]:not(.logout_btn){
 	float: right;
-    margin-right: 12%;
+    margin-right: 11%;
 }
+
+/*modifies container color*/
+.container:not(.none_con_style){
+	border: solid 2px #3A3434;
+    background: #B19F9F;
+    border-radius: 5px;
+    margin-bottom: 20px;
+	margin-top: 10px;
+    padding-bottom: 10px;
+	min-height: 650px;
+	min-width: 600px;
+	width: 90%;
 }
+
+/*gives image slight difference in appearance*/
+img {
+    border: solid 1px black;
+    border-radius: 30px;
+}
+
+/*changes initial button colors, submit inputs and button tags*/
+.btn {
+	color: #fff;
+    background-color: #D20303;
+    border-color: black;
+	border: solid 2px black;
+}
+
+/*changes button color on hover*/
+.btn:hover, .btn:focus {
+	color: #fff;
+    border-color: black;
+	background-color: #B91414;
+	border: solid 2px;
+}
+
+/*changes warning border*/
+.alert-warning {
+	border-color: black;
+}
+
+.navbar-nav>li>a.btn {
+	padding-top: 5px;
+    padding-bottom: 0px;
+    height: 35px;
+    margin-top: 7px;
+}
+
+.navbar-nav>li>a.btn:hover {
+	color: #fff;
+    border-color: black;
+	background-color: #B91414;
+	border: solid 2px;
+}
+
+.login a {
+    float: right;
+    margin-right: 8%;
+}
+
+

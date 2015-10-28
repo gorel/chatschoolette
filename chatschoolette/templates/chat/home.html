@@ -7,12 +7,28 @@
     <form method="POST" action="{{ url_for('chat.home') }}">
         {{ form.csrf_token }}
         <table class="table borderless">
-            <tr><td>
-                {{ form.video_button }}
-            </td></tr>
-            <tr><td>
-                {{ form.text_button }}
-            </td></tr>
+            <tr>
+                <td>
+                    <img
+                        src="{{ url_for('static', filename='videochat.gif') }}"
+                        style="width:300px;height:auto;"
+                    >
+                </td>
+                <td>
+                    {{ form.video_button(class='btn btn-primary', style='width:300px;height:100px;font-size:48px;') }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <img
+                        src="{{ url_for('static', filename='textchat.png') }}"
+                        style="width:300px;height:auto;"
+                    >
+                </td>
+                <td>
+                    {{ form.text_button(class='btn btn-primary', style='width:300px;height:100px;font-size:48px;') }}
+                </td>
+            </tr>
         </table>
     </form>
 

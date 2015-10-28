@@ -81,6 +81,9 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         # User has authenticated. Log in.
+        # Remove the user from all chat queues
+        form.user.chat = None
+        db.session.commit()
         flash('Welcome back to ChatSchoolette!', 'alert-success')
         login_user(form.user, remember=form.remember.data, force=True)
         return redirect(request.args.get('next') or url_for('default.home'))
@@ -93,6 +96,8 @@ def logout():
     # Don't set login required, because it will send the user to the login page
     # before redirecting them to logout. It doesn't make much sense to the user.
     if current_user.is_authenticated:
+        current_user.chat = None
+        db.session.commit()
         logout_user()
     flash('You have successfully logged out.', 'alert-success')
     return redirect(url_for('default.home'))

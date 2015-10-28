@@ -3,7 +3,8 @@
 <div class="page-header">
     <h1>Video Chat</h1>
     <form action="#" onsubmit="return add_friend()">
-        <span class="pull-right" id="friendadd"></span>
+        <input type="hidden" id="pid" value="0">
+        <button class="btn btn-danger pull-right" id="friendadd" disabled>Add friend</button>
     </form>
 </div>
 
@@ -57,11 +58,14 @@
         }
         for (var i = 0; i < streams.length; i++) {
             var stream = streams[i];
-            document.getElementById('friendadd').innerHTML = '<button id="friendaddbutton" class="btn btn-danger" type="submit">Add friend</button>';
             document.getElementById('subscriber').innerHTML = '';
             console.log(stream.connection.connectionId+"&"+session.connection.connectionId);
             if (stream.connection.connectionId != session.connection.connectionId) {
                 session.subscribe(stream, 'subscriber', sub_opts);
+                session.signal({
+                    type: 'pid',
+                    data: "{{ current_user.id }}"
+                });
             }
         }
     }
@@ -78,8 +82,7 @@
         if (msgTxt.value.length > 0) {
             session.signal({
                 type: 'chat',
-                data: "{{ current_user.username }}: " + msgTxt.value,
-                sender: "{{ current_user.username}}"
+                data: "{{ current_user.username }}: " + msgTxt.value
             },
             function(error) {
                 if (!error) {
@@ -98,11 +101,24 @@
         msg.scrollIntoView();
     });
 
+    session.on('signal:pid', function(event) {
+        if (event.from.connectionId != session.connection.connectionId) {
+            document.getElementById('friendadd').disabled = false;
+            var pid = document.getElementById('pid').value = event.data;
+        }
+    });
+
     function add_friend() {
-        console.log('Adding friend.');
-        // TODO: JQuery callback stuff!
-        alert('You are now friends with !');
-        document.getElementById('friendaddbutton').disabled = true;
+        var pid = document.querySelector('#pid');
+        var btn = document.querySelector('#friendadd');
+        $.ajax({
+            url: "/account/friend/" + pid.value + "/",
+            data: {csrf_token: "{{ csrf_token() }}"},
+            method: 'POST'
+        }).done(function() {
+            btn.innerHTML = 'Friend added!';
+            btn.disabled = true;
+        });
         return false;
     }
 

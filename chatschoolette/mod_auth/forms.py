@@ -56,7 +56,7 @@ class RegistrationForm(Form):
             self.gender.errors.append('Please select a valid gender.')
             return False
 
-        if ((datetime.now().date() - self.birthdate.data).days / 365) < 18:
+        if ((datetime.now().date() - self.birthdate.data).days / 365) < 35:
             self.birthdate.errors.append(
                 'Sorry, you must be 18 or older to use ChatSchoolette :(',
             )

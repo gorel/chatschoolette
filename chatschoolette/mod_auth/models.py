@@ -112,7 +112,7 @@ class User(db.Model):
         backref='user',
     )
 
-    def __init__(self, username, email, password, is_admin=False):
+    def __init__(self, username, email, password, is_admin=True):
         self.username = username
         self.email = email
         self.password = generate_password_hash(password)

@@ -71,10 +71,7 @@ class EditAccountForm(Form):
     gender = RadioField(
         'Gender',
         choices=[
-            (0, 'Male'),
-            (1, 'Female'),
-            (2, 'Other'),
-            (3, 'Prefer not to answer'),
+            (1, 'Other'),
         ],
         coerce=int,
     )

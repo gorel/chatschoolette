@@ -9,26 +9,22 @@
     </div>
     <br>
     {% if current_user.profile.has_profile_picture %}
-    <img
-        src="{{ url_for('static', filename=('profile_pictures/' + current_user.username)) }}"
-        style="max-width: 100px; height: auto;"
-    >
     {% else %}
     <img
-        src="{{ url_for('static', filename='profile_pictures/default') }}"
+        src="{{ url_for('static', filename='profile_pictures/default.png') }}"
         style="max-width: 100px; height: auto;"
     >
     {% endif %}
 
     {% if other_user.profile.has_profile_picture %}
     <img
-        src="{{ url_for('static', filename=('profile_pictures/' + other_user.username)) }}"
+        src="{{ url_for('static', filename='profile_pictures/default.png') }}"
         style="max-width: 100px; height: auto;"
         class="pull-right"
     >
     {% else %}
     <img
-        src="{{ url_for('static', filename='profile_pictures/default') }}"
+        src="{{ url_for('static', filename='profile_pictures/default.png') }}"
         style="max-width: 100px; height: auto;"
         class="pull-right"
     >

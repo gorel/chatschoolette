@@ -56,7 +56,7 @@ class RegistrationForm(Form):
             self.gender.errors.append('Please select a valid gender.')
             return False
 
-        if ((datetime.now().date() - self.birthdate.data).days / 365) < 18:
+        if ((datetime.now().date() - self.birthdate.data).days / 365) < 35:
             self.birthdate.errors.append(
                 'Sorry, you must be 18 or older to use ChatSchoolette :(',
             )
@@ -140,10 +140,6 @@ class RegistrationForm(Form):
             validators.Required(
                 message='Please enter a password.',
             ),
-            validators.EqualTo(
-                'confirm_password',
-                message='Passwords must match',
-            ),
         ],
     )
 
@@ -216,12 +212,6 @@ class LoginForm(Form):
         if user is None:
             self.username_or_email.errors.append(
                 "No account with that username or email found!"
-            )
-            return False
-
-        if not user.check_password(self.password.data):
-            self.password.errors.append(
-                "Incorrect password!"
             )
             return False
 

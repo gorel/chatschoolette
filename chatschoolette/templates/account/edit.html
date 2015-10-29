@@ -14,10 +14,7 @@
             {{ render_field(form.gender) }}
             {{ render_field(form.profile_picture) }}
             {% if current_user.profile.has_profile_picture %}
-            <img
-                src="{{ url_for('static', filename=('profile_pictures/' + current_user.username)) }}"
-                style="max-width: 300px; height: auto;"
-            >
+            <img src="{{ url_for('static', filename='default.png') }}" style="max-width: 300px; height: auto;">
             {% else %}
             <img src="{{ url_for('static', filename='default.png') }}" style="max-width: 300px; height: auto;">
             {% endif %}

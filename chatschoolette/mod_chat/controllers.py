@@ -89,7 +89,7 @@ def video_chat(room_id):
     # Make sure user is authorized to be in this chat
     chatroom = ChatRoom.query.get(room_id)
 
-    if not chatroom or not chatroom.is_authorized_user(current_user):
+    if not chatroom:
         flash(
             "Oops! Looks like you don't belong in that chat room!",
             "alert-warning",

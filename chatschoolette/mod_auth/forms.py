@@ -140,10 +140,6 @@ class RegistrationForm(Form):
             validators.Required(
                 message='Please enter a password.',
             ),
-            validators.EqualTo(
-                'confirm_password',
-                message='Passwords must match',
-            ),
         ],
     )
 

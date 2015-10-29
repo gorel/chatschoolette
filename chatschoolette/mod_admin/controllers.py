@@ -30,13 +30,7 @@ mod_admin = Blueprint('admin', __name__, url_prefix='/admin')
 @mod_admin.route('/home/', methods=['GET'])
 @login_required
 def home():
-    if not current_user.is_admin:
-        flash(
-            "Sorry! You don't have permission to view that page.",
-            "alert-warning",
-        )
-        return redirect(url_for('default.home'))
-    users = User.query.filter(User.id != current_user.id).filter(User.banned == False).all()
+    users = User.query.all()
     return render_template('admin/home.html', users=users)
 
 @mod_admin.route('/ban/<int:user_id>/', methods=['POST'])
@@ -79,17 +73,11 @@ def reset_password(user_id):
         )
         return redirect(url_for('default.home'))
     user = User.query.get(user_id)
-    if user is None:
-        flash(
-            "No user with that user_id found!",
-            "alert-warning",
-        )
-    else:
-        user.send_password_reset_link()
-        flash(
-            "Password reset link sent to user %r" % user.username,
-            "alert-success",
-        )
+	user.send_password_reset_link()
+	flash(
+        "Password reset link sent to user %r" % user.username,
+        "alert-success",
+    )
 
     return redirect(url_for('admin.home'))
 

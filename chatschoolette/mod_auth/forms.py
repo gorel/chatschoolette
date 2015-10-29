@@ -194,7 +194,7 @@ class RegistrationForm(Form):
         'Remember Me?',
     )
 
-    recaptcha = BooleanField('Testing')#RecaptchaField()
+    recaptcha = RecaptchaField()
 
 class LoginForm(Form):
     def __init__(self, *args, **kwargs):

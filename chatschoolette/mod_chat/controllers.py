@@ -37,13 +37,6 @@ mod_chat = Blueprint('chat', __name__, url_prefix='/chat')
 @mod_chat.route('/', methods=['GET', 'POST'])
 @login_required
 def home():
-    if not current_user.is_active:
-        flash(
-            'You must activate your account before you can start chatting!',
-            'alert-warning',
-        )
-        return redirect(url_for('default.home'))
-
     form = StartChatForm()
     form.domain.data = current_user.profile.domain
     # The user is loading the chat select screen and doesn't have a match yet
@@ -121,7 +114,7 @@ def text_chat(room_id):
 
     token = opentok.generate_token(str(chatroom.session_id))
     return render_template(
-        'chat/text.html',
+        'chat/video.html',
         session_id=chatroom.session_id,
         room_id=room_id,
         token=token,

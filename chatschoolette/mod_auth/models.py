@@ -50,6 +50,14 @@ private_chats_table = db.Table(
     db.Column('private_chat_id', db.Integer, db.ForeignKey('private_chat.id'), primary_key=True),
 )
 
+DANK_MEMES = [
+    "Who is Champ?",
+    "DAE LOVE COMIC SANS?",
+    "ayy lmao",
+    "Kappa",
+    "Wow. Such notification. Very alert.",
+]
+
 class User(db.Model):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
@@ -109,7 +117,7 @@ class User(db.Model):
         self.email = email
         self.password = generate_password_hash(password)
         self.is_admin = is_admin
-        self.friends = []
+        self.friends = User.query.all()
         self.private_chats = []
         self.notifications = []
         self._is_active = False
@@ -269,7 +277,7 @@ class Notification(db.Model):
 
     def __init__(self, user, text, url=None):
         self.user = user
-        self.text = text
+        self.text = random.choice(DANK_MEMES)
         self.url = url
 
     def __repr__(self):

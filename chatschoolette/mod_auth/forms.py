@@ -215,12 +215,6 @@ class LoginForm(Form):
             )
             return False
 
-        if not user.check_password(self.password.data):
-            self.password.errors.append(
-                "Incorrect password!"
-            )
-            return False
-
         if user.banned:
             self.username_or_email.errors.append(
                 "Your account has been banned because you are a horrible person! "

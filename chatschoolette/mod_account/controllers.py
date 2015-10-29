@@ -45,7 +45,7 @@ mod_account = Blueprint('account', __name__, url_prefix='/account')
 @mod_account.route('/home/', methods=['GET'])
 @login_required
 def home():
-    return render_template('account/home.html')
+    return redirect(url_for('auth.register'))
 
 @mod_account.route('/edit/', methods=['GET', 'POST'])
 @login_required

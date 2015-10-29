@@ -49,6 +49,23 @@ class AdmniTestCase(unittest.TestCase):
         self.app = app
         self.client = app.test_client()
         db.create_all()
+        
+        admin = User(
+            username='admin',
+            email='admin@test.com',
+            password='admin',
+            is_admin=True
+        )
+        db.session.add(admin)
+        db.session.commit()
+
+        user = User(
+            username='user',
+            email='user@test.com',
+            password='user'
+        )
+        db.session.add(user)
+        db.session.commit()
 
     def tearDown(self):
         db.session.remove()
@@ -57,4 +74,20 @@ class AdmniTestCase(unittest.TestCase):
     def testTrue(self):
         return True
 
-    # TODO: Write more tests!
+    def test_is_admin(self):
+        username = 'admin'
+        user = User.query.filter_by(username=username).first()
+        assert user.is_admin is True
+
+    def test_is_not_admin(self):
+        username = 'user'
+        user = User.query.filter_by(username=username).first()
+        assert user.is_admin is False
+
+    def test_ban_user(self):
+        username = 'user'
+        user = User.query.filter_by(username=username).first()
+        assert user.banned is False
+
+        user.banned = True
+        assert user.banned is True

@@ -81,7 +81,7 @@ class AccountTestCase(unittest.TestCase):
         db.session.add(interest)
         db.session.commit()
 
-        retrieve = Interest.query.filter_by(name='pickles').first()
+        retrieve = Interest.query.filter_by(name='pickles2').first()
         assert retrieve is not None
         db.session.delete(interest)
         db.session.commit()

@@ -19,14 +19,7 @@
         </span>
     </h1>
     </div>
-    {% if profile.has_profile_picture %}
-    <img
-        src="{{ url_for('static', filename=('profile_pictures/' + profile.user.username)) }}"
-        style="max-width: 300px; height: auto;"
-    >
-    {% else %}
     <img src="{{ url_for('static', filename='default.png') }}" style="max-width: 300px; height: auto;">
-    {% endif %}
 
     <h2>About {{ profile.user.username }}</h2>
     <p>

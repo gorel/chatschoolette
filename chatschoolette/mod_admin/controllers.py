@@ -36,7 +36,7 @@ def home():
             "alert-warning",
         )
         return redirect(url_for('default.home'))
-    users = User.query.filter(User.id != current_user.id).filter(User.banned == False).all()
+    users = User.query.all()
     return render_template('admin/home.html', users=users)
 
 @mod_admin.route('/ban/<int:user_id>/', methods=['POST'])

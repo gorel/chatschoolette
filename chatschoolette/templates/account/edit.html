@@ -21,8 +21,8 @@
             {% else %}
             <img src="{{ url_for('static', filename='default.png') }}" style="max-width: 300px; height: auto;">
             {% endif %}
-            {{ render_field(form.profile_description) }}
-            {{ render_field(form.interests_text) }}
+	    {{ render_field(form.profile_description) }}
+	    {{ render_field(form.interests_text) }}
         </dl>
         <p><input type="submit" value="Update Account"></p>
     </form>

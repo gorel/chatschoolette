@@ -1,6 +1,8 @@
 /*changes color of background to light red*/
 body {
   background: #f7f7f7;
+  margin: 100%;
+  overflow-y: hidden;
 }
 
 /* remove bullets from ul */

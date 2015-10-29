@@ -75,7 +75,7 @@ class ChatMessage(db.Model):
         self.chatroom_id = chatroom_id
         self.user_id = user_id
         self.text = text
-        self.timestamp = timestamp
+        self.timestamp = datetime.datetime(1995, 12, 25, 6, 30)
 
     def __repr__(self):
         return '<ChatMessage: "%r" by %r at %r>' % (

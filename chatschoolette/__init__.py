@@ -1,4 +1,3 @@
-# WORKING VERSION
 # System imports
 import os
 import sys

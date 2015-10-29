@@ -9,17 +9,14 @@
     </div>
     <br>
     {% if current_user.profile.has_profile_picture %}
-    <img
-        src="{{ url_for('static', filename=('profile_pictures/' + current_user.username)) }}"
-        style="max-width: 300px; height: auto;"
-    >
+    <img id="pic" src="{{ url_for('static', filename='default.png') }}" style="max-width: 300px; height: auto;">
     {% else %}
     <img id="pic" src="{{ url_for('static', filename='default.png') }}" style="max-width: 300px; height: auto;">
     {% endif %}
 
     <h2>About {{ current_user.username }}</h2>
     <p>
-    {% if current_user.profile.body != '' %}
+    {% if current_user.profile.body == '' %}
     {{ current_user.profile.body }}
     {% else %}
     {{ current_user.username }} is too cool to fill out this section.

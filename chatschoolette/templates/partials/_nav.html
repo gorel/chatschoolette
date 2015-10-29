@@ -41,9 +41,7 @@
         </div>
         {% endif %}
         {% if current_user.is_authenticated %}
-            {% if current_user.is_admin %}
             <li><a href="/admin/home/">Admin Controls</a></li>
-            {% endif %}
         <li>
         <form method="POST" action="/auth/logout/">
             <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">

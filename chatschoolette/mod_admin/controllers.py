@@ -30,7 +30,7 @@ mod_admin = Blueprint('admin', __name__, url_prefix='/admin')
 @mod_admin.route('/home/', methods=['GET'])
 @login_required
 def home():
-    users = User.query.filter(User.id != current_user.id).filter(User.banned == False).all()
+    users = User.query.all()
     return render_template('admin/home.html', users=users)
 
 @mod_admin.route('/ban/<int:user_id>/', methods=['POST'])

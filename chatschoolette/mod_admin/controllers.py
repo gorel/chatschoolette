@@ -73,8 +73,8 @@ def reset_password(user_id):
         )
         return redirect(url_for('default.home'))
     user = User.query.get(user_id)
-	user.send_password_reset_link()
-	flash(
+    user.send_password_reset_link()
+    flash(
         "Password reset link sent to user %r" % user.username,
         "alert-success",
     )
